@@ -1,51 +1,49 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif //UNITY_EDITOR
 
 namespace Omega.Rendering.PostProcessing
 {
-    [ExecuteInEditMode]
-    public class ObjSpaceMotionBlur : PostProcessMono
+    [System.Serializable]
+    public class ObjSpaceMotionBlur : ViewSpaceMotionBlur
     {
+        public override string name { get { return "Obj Space Motion Blur"; } }
+
         [SerializeField]
-        private Transform target;
-        [SerializeField]
-        [Range(0f, 0.1f)]
-        private float blurFactor = 0.05f;
-        public override Shader shader
-        {
-            get { return Shader.Find("Hidden/MotionBlur"); }
-        }
+        protected Transform target;
+
         public Matrix4x4 MVP
         {
             get
             {
-                var P = camera.projectionMatrix;
-                var V = camera.worldToCameraMatrix;
-                var M = target.localToWorldMatrix;
-                return P * V * M;
+                Matrix4x4 M = target.localToWorldMatrix;
+                return VP * M;
             }
         }
-        public Matrix4x4 prevMVP { get; protected set; }
 
-        public override void Process(RenderTexture src, RenderTexture dest)
+        public ObjSpaceMotionBlur(Material material) : base(material) {}
+
+        public override void BeforeProcess()
         {
             var MVP = this.MVP;
-            material.SetMatrix("_CurrentToPrevProjPos", prevMVP * MVP.inverse);
-            material.SetFloat("_BlurFactor", blurFactor);
-            Graphics.Blit(src, dest, material);
-            prevMVP = MVP;
+            material.SetMatrix("_CurrentToPrevProjPos", prevMatrix * MVP.inverse);
+            material.SetFloat("_MotionBlurFactor", blurFactor);
+            prevMatrix = MVP;
         }
 
-        protected override void Awake()
+        public override void Init(Material material)
         {
-            base.Awake();
-            depthTextureMode = DepthTextureMode.Depth;
-            if (target == null)
-            {
-                enabled = false;
-                return;
-            }
-            prevMVP = MVP;
+            base.Init(material);            
+            prevMatrix = MVP;
         }
+
+#if UNITY_EDITOR
+        protected override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            target = EditorGUILayout.ObjectField(target, typeof(Transform), true) as Transform;
+        }
+#endif //UNITY_EDITOR
     }
 }
-

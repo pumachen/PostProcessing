@@ -3,7 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-		_BlurFactor ("Blur Factor", Range(0, 0.1)) = 0.05
+		_MotionBlurFactor("Blur Factor", Range(0, 0.1)) = 0.05
     }
     SubShader
     {

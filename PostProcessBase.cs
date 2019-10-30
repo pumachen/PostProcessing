@@ -2,7 +2,7 @@
 
 namespace Omega.Rendering.PostProcessing
 {
-    public abstract class PostProcessBase : IPostProcess
+    public abstract class PostProcessBase : Object, IPostProcess
     {
         public virtual Material material { get; protected set; }
         public abstract Shader shader { get; }

@@ -1,43 +1,32 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif //UNITY_EDITOR
 
 namespace Omega.Rendering.PostProcessing
 {
-    public class ObjectSpaceMotionBlur : PostProcessEffect
+    [System.Serializable]
+    public abstract class MotionBlur : PostProcessEffect
     {
-        public override string name { get { return "Motion Blur"; } }
         [SerializeField]
-        [Range(0f, 0.1f)]
-        private float blurFactor = 0.05f;
-
-        [SerializeField]
-        private Camera camera;
-        [SerializeField]
-        private Transform target;
-
-        public Matrix4x4 MVP
+        private float m_blurFactor;
+        public float blurFactor
         {
-            get
+            get { return m_blurFactor; }
+            set
             {
-                var P = camera.projectionMatrix;
-                var V = camera.worldToCameraMatrix;
-                var M = target.localToWorldMatrix;
-                return P * V * M;
+                m_blurFactor = value;
+                material.SetFloat("_MotionBlurFactor", value);
             }
         }
 
-        public Matrix4x4 prevMVP { get; protected set; }
+        public MotionBlur(Material material) : base(material) {}
 
-        public override void BeforeProcess(Material material)
+#if UNITY_EDITOR
+        protected override void OnInspectorGUI()
         {
-            var MVP = this.MVP;
-            material.SetMatrix("_CurrentToPrevProjPos", prevMVP * MVP.inverse);
-            material.SetFloat("_BlurFactor", blurFactor);
-            prevMVP = MVP;
+            blurFactor = EditorGUILayout.Slider("Blur Factor", blurFactor, 0.0f, 1.0f);
         }
-
-        public override void Init(Material material)
-        {
-            
-        }
+#endif //UNITY_EDITOR
     }
 }

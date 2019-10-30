@@ -10,7 +10,7 @@
 #endif
 
 	float4x4 _CurrentToPrevProjPos;
-	float _BlurFactor;
+	float _MotionBlurFactor;
 
 	fixed4 fragMotionBlur(v2f_img i) : SV_Target
 	{
@@ -25,7 +25,7 @@
 		float4 prevPos = mul(_CurrentToPrevProjPos, projPos);
 		prevPos = lerp(projPos, prevPos, step(0, depth));
 		prevPos /= prevPos.w;
-		float2 blurVec = (prevPos.xy - projPos.xy) * _BlurFactor;
+		float2 blurVec = (prevPos.xy - projPos.xy) * _MotionBlurFactor;
 		float2 dv = blurVec / NUM_SAMPLERS;
 
 		float2 uv = i.uv;
@@ -39,6 +39,7 @@
 			}
 			col /= NUM_SAMPLERS;
 		}
+		//return fixed4(1, 1, 1, 1);
 		return col;
 	}
 #endif //POST_PROCESS_MOTION_BLUR_INCLUDED
