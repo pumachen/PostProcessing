@@ -39,7 +39,6 @@
 			}
 			col /= NUM_SAMPLERS;
 		}
-		//return fixed4(1, 1, 1, 1);
 		return col;
 	}
 #endif //POST_PROCESS_MOTION_BLUR_INCLUDED

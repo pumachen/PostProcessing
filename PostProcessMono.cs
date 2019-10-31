@@ -3,6 +3,7 @@
 namespace Omega.Rendering.PostProcessing
 {
     [RequireComponent(typeof(Camera))]
+    [ExecuteInEditMode]
     public abstract class PostProcessMono : MonoBehaviour, IPostProcess
     {
         public Material material { get; protected set; }

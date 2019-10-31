@@ -34,7 +34,7 @@ namespace Omega.Rendering.PostProcessing
 
         public override void Init(Material material)
         {
-            base.Init(material);            
+            base.Init(material);          
             prevMatrix = MVP;
         }
 
