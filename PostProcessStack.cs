@@ -12,7 +12,7 @@ namespace Omega.Rendering.PostProcessing
     public class PostProcessStack : PostProcessMono
     {
         public PostProcessEffect[] effects;
-        public ObjSpaceMotionBlur motionBlur;
+        public MotionBlur motionBlur;
         public override Shader shader { get { return Shader.Find("Hidden/Uber"); } }
 
         protected override void Awake()
@@ -25,9 +25,9 @@ namespace Omega.Rendering.PostProcessing
 
         public override void Process(RenderTexture src, RenderTexture dest)
         {
-            motionBlur.BeforeProcess();
-            Graphics.Blit(src, dest, material, 1);
-            motionBlur.AfterProcess();
+            motionBlur.beforeProcess?.Invoke();
+            Graphics.Blit(src, dest, material, 0);
+            motionBlur.beforeProcess?.Invoke();
         }
     }
 
@@ -44,10 +44,7 @@ namespace Omega.Rendering.PostProcessing
 
         public override void OnInspectorGUI()
         {
-            foreach (var effect in target.effects)
-            {
-                effect.InspectorGUI();
-            }
+            target.motionBlur.InspectorGUI();
         }
     }
 #endif //UNITY_EDITOR

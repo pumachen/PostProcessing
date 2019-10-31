@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -8,7 +9,7 @@ namespace Omega.Rendering.PostProcessing
     public abstract class PostProcessEffect
     {
         public abstract string name { get; }
-        protected bool m_enabled;
+        private bool m_enabled;
         public bool enabled
         {
             get { return m_enabled; }
@@ -25,6 +26,26 @@ namespace Omega.Rendering.PostProcessing
         }
         protected Material material { get; private set; }
 
+        private UnityAction m_init;
+        private UnityAction m_beforeProcess;
+        private UnityAction m_afterProcess;
+
+        public UnityAction init
+        {
+            get { return enabled ? m_init : null; }
+            protected set { m_init = value; }
+        }
+        public UnityAction beforeProcess
+        {
+            get { return enabled ? m_beforeProcess : null; }
+            protected set { m_beforeProcess = value; }
+        }
+        public UnityAction afterProcess
+        {
+            get { return enabled ? m_afterProcess : null; }
+            protected set { m_afterProcess = value; }
+        }
+
         protected PostProcessEffect(Material material)
         {
             this.material = material;
@@ -36,9 +57,7 @@ namespace Omega.Rendering.PostProcessing
         {
             this.material = material;
         }
-        public virtual void BeforeProcess() {}
-        public virtual void AfterProcess() {}
-
+        
 #if UNITY_EDITOR
 
         private bool unfold = false;
@@ -46,9 +65,12 @@ namespace Omega.Rendering.PostProcessing
         public void InspectorGUI()
         {
             GUILayout.BeginVertical();
-
-            enabled = EditorGUILayout.ToggleLeft(name, enabled);
-            unfold = EditorGUILayout.Foldout(unfold, "");
+            GUILayout.BeginHorizontal();
+            
+            enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
+            EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
+            unfold = EditorGUILayout.Foldout(unfold, name);
+            GUILayout.EndHorizontal();
 
             if (unfold)
             {
