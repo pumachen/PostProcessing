@@ -12,7 +12,7 @@
 	float4x4 _CurrentToPrevProjPos;
 	float _MotionBlurFactor;
 
-	fixed4 fragMotionBlur(v2f_img i) : SV_Target
+	fixed4 frag_MotionBlur(v2f_img i) : SV_Target
 	{
 	#ifdef DEPTH_TEXTURE
 		float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);

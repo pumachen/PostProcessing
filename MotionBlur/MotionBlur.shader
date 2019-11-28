@@ -13,7 +13,7 @@
         {
             CGPROGRAM
             #pragma vertex vert_img
-            #pragma fragment fragMotionBlur
+            #pragma fragment frag_MotionBlur
 
 			#define NUM_SAMPLERS 9
 			#define DEPTH_TEXTURE

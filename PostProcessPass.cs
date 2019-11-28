@@ -9,7 +9,7 @@ using UnityEditorInternal;
 
 namespace Omega.Rendering.PostProcessing
 {
-    public class PostProcessStack : PostProcessMono
+    public class PostProcessPass : PostProcessMono
     {
         public PostProcessEffect[] effects;
         public MotionBlur motionBlur;
@@ -32,14 +32,14 @@ namespace Omega.Rendering.PostProcessing
     }
 
 #if UNITY_EDITOR
-    [CustomEditor(typeof(PostProcessStack))]
+    [CustomEditor(typeof(PostProcessPass))]
     public class PostProcessStackEditor : Editor
     {
-        new PostProcessStack target;
+        new PostProcessPass target;
         
         private void OnEnable()
         {
-            target = base.target as PostProcessStack;
+            target = base.target as PostProcessPass;
         }
 
         public override void OnInspectorGUI()
