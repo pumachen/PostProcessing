@@ -1,4 +1,4 @@
-﻿Shader "Hidden/MotionBlur"
+﻿Shader "Hidden/PostProcess/MotionBlur"
 {
     Properties
     {
@@ -18,8 +18,8 @@
 			#define NUM_SAMPLERS 9
 			#define DEPTH_TEXTURE
 
-            #include "UnityCG.cginc"
-			#include "MotionBlur.cginc"
+			#include "UnityCG.cginc"
+			#include "CGIncludes/MotionBlur.cginc"
 
             ENDCG
         }

@@ -6,10 +6,12 @@ using UnityEditor;
 
 namespace Omega.Rendering.PostProcessing
 {
+    [System.Serializable]
     public abstract class PostProcessEffect
     {
         public abstract string name { get; }
-        private bool m_enabled;
+        [SerializeField]
+        private bool m_enabled = false;
         public bool enabled
         {
             get { return m_enabled; }
@@ -24,39 +26,22 @@ namespace Omega.Rendering.PostProcessing
                     OnDisable();
             }
         }
-        protected Material material { get; private set; }
-
-        private UnityAction m_init;
-        private UnityAction m_beforeProcess;
-        private UnityAction m_afterProcess;
-
-        public UnityAction init
+        protected abstract Shader shader { get; }
+        protected Material m_material;
+        protected virtual Material material
         {
-            get { return enabled ? m_init : null; }
-            protected set { m_init = value; }
-        }
-        public UnityAction beforeProcess
-        {
-            get { return enabled ? m_beforeProcess : null; }
-            protected set { m_beforeProcess = value; }
-        }
-        public UnityAction afterProcess
-        {
-            get { return enabled ? m_afterProcess : null; }
-            protected set { m_afterProcess = value; }
+            get
+            {
+                if (m_material == null)
+                    m_material = new Material(shader);
+                return m_material;
+            }
         }
 
-        protected PostProcessEffect(Material material)
-        {
-            this.material = material;
-        }
-
-        protected virtual void OnEnable() {}
+        protected abstract void OnEnable();
         protected virtual void OnDisable() {}
-        public virtual void Init(Material material)
-        {
-            this.material = material;
-        }
+
+        public abstract void Process(RenderTexture src, RenderTexture dest);
         
 #if UNITY_EDITOR
 

@@ -1,45 +1,66 @@
 ﻿using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditorInternal;
+#endif //UNITY_EDITOR
+
 namespace Omega.Rendering.PostProcessing
 {
     [RequireComponent(typeof(Camera))]
     [ExecuteInEditMode]
-    public abstract class PostProcessMono : MonoBehaviour, IPostProcess
+    public class PostProcessMono : MonoBehaviour
     {
-        public Material material { get; protected set; }
-        protected Camera m_camera;
-        public virtual new Camera camera
-        {
-            get
-            {
-                if (m_camera == null)
-                    m_camera = GetComponent<Camera>();
-                return m_camera;
-            }
-            protected set { m_camera = value; }
-        }
-        public virtual DepthTextureMode depthTextureMode
-        {
-            get { return camera.depthTextureMode; }
-            protected set { camera.depthTextureMode = value; }
-        }
-        public abstract Shader shader { get; }
+        [SerializeField]
+        [HideInInspector]
+        MotionBlur motionBlur;
 
-        protected virtual void Awake()
+        [SerializeField]
+        [HideInInspector]
+        Bloom bloom;
+
+        [SerializeField]
+        PostProcessEffect[] effects;
+
+        protected void Start()
         {
-            Init();
+            effects = new PostProcessEffect[]
+                {
+                    motionBlur,
+                    bloom
+                };
         }
 
         protected virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            Process(src, dest);
+            foreach (var effect in effects)
+            {
+                if (effect.enabled)
+                {
+                    effect.Process(src, dest);
+                }
+            }
         }
 
-        public virtual void Init()
+#if UNITY_EDITOR
+        [CustomEditor(typeof(PostProcessMono))]
+        public class PostProcessStackEditor : Editor
         {
-            material = new Material(shader);
+            new PostProcessMono target;
+
+            private void OnEnable()
+            {
+                target = base.target as PostProcessMono;
+            }
+
+            public override void OnInspectorGUI()
+            {
+                foreach (var effect in target.effects)
+                {
+                    effect.InspectorGUI();
+                }
+            }
         }
-        public abstract void Process(RenderTexture src, RenderTexture dest);
-        
+#endif //UNITY_EDITORd
     }
 }

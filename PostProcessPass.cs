@@ -9,25 +9,24 @@ using UnityEditorInternal;
 
 namespace Omega.Rendering.PostProcessing
 {
-    public class PostProcessPass : PostProcessMono
+    /*public class PostProcess
     {
         public PostProcessEffect[] effects;
         public MotionBlur motionBlur;
-        public override Shader shader { get { return Shader.Find("Hidden/Uber"); } }
+        RenderTexture src;
+        RenderTexture dest;
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
+            motionBlur = new MotionBlur(material);
             motionBlur.Init(material);
             if (effects == null)
                 effects = new PostProcessEffect[] { motionBlur };
         }
 
-        public override void Process(RenderTexture src, RenderTexture dest)
+        public void Process()
         {
-            motionBlur.beforeProcess?.Invoke();
-            Graphics.Blit(src, dest, material, 0);
-            motionBlur.beforeProcess?.Invoke();
+            
         }
     }
 
@@ -47,5 +46,5 @@ namespace Omega.Rendering.PostProcessing
             target.motionBlur.InspectorGUI();
         }
     }
-#endif //UNITY_EDITOR
+#endif //UNITY_EDITOR*/
 }
