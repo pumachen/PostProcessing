@@ -9,7 +9,6 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public class MotionBlur : PostProcessEffect
     {
-        public override string name { get { return "Motion Blur"; } }
         protected override Shader shader
         {
             get { return Shader.Find("Hidden/PostProcess/MotionBlur"); }
@@ -106,9 +105,14 @@ namespace Omega.Rendering.PostProcessing
                 enabled = false;
                 return;
             }
+            base.OnEnable();
+        }
+
+        public override void Init()
+        {
             camera.depthTextureMode = DepthTextureMode.Depth;
         }
-        
+
         public override void Process(RenderTexture src, RenderTexture dest)
         {
             var matrix = this.matrix;
@@ -133,9 +137,11 @@ namespace Omega.Rendering.PostProcessing
         }
 
 #if UNITY_EDITOR
+        public override string name { get { return "Motion Blur"; } }
+
         protected override void OnInspectorGUI()
         {
-            blurFactor = EditorGUILayout.Slider("Blur Factor", blurFactor, 0.0f, 1.0f);
+            blurFactor = EditorGUILayout.Slider("Blur Factor", blurFactor, 0.0f, 0.1f);
             mode = (Mode)EditorGUILayout.EnumPopup("Method", mode);
             switch(mode)
             {

@@ -1,15 +1,30 @@
 #ifndef POST_PROCESS_BLOOM_INCLUDED
 #define POST_PROCESS_BLOOM_INCLUDED
 
+#define Max3(a,b,c) max(max((a),(b)),(c))
+
 sampler2D _MainTex;
 sampler2D _Luminance;
+
+/*
+	x: scatter
+	y: clamp
+	z: threshold (linear)
+	w: threshold knee
+*/
+float4 _FilterParams;
+
+#define Scatter       _FilterParams.x;
+#define ClampMax      _FilterParams.y;
+#define Threshold     _FilterParams.z;
+#define thresholdKnee _FilterParams.w;
 
 fixed4 frag_DownSample(v2f_img i) : SV_Target
 {
 	fixed4 col = tex2D(_MainTex, i.uv);
-	//float luminance = Luminance(col.rgb);
-	float luminance = max(col.r, max(col.g, col.b));
-	return saturate(pow(luminance, 8)) * col;
+	//float brightness = Luminance(col.rgb);
+	float brightness = Max3(col.r, col.g, col.b);
+	return saturate(pow(brightness, 8)) * col;
 }
 
 fixed4 frag_UpSample(v2f_img i) : SV_Target

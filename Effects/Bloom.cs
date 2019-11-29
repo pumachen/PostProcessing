@@ -10,7 +10,6 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public class Bloom : PostProcessEffect
     {
-        public override string name { get { return "Bloom"; } }
         protected override Shader shader
         {
             get { return Shader.Find("Hidden/PostProcess/Bloom"); }
@@ -39,12 +38,14 @@ namespace Omega.Rendering.PostProcessing
             Graphics.Blit(src, dest, material, 1);
         }
 
-        protected override void OnEnable()
+        public override void Init()
         {
             material.SetTexture("_Luminance", luminanceRT);
         }
 
 #if UNITY_EDITOR
+        public override string name { get { return "Bloom"; } }
+
         protected override void OnInspectorGUI()
         {
             EditorGUILayout.ObjectField(luminanceRT, typeof(RenderTexture), true);

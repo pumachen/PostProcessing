@@ -9,7 +9,6 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public abstract class PostProcessEffect
     {
-        public abstract string name { get; }
         [SerializeField]
         private bool m_enabled = false;
         public bool enabled
@@ -38,13 +37,35 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected abstract void OnEnable();
-        protected virtual void OnDisable() {}
+        protected virtual void OnEnable()
+        {
+            Init();
+            m_onEnable?.Invoke();
+        }
+        protected virtual void OnDisable()
+        {
+            m_onDisable?.Invoke();
+        }
+        private event UnityAction m_onEnable;
+        private event UnityAction m_onDisable;
+        public virtual event UnityAction onEnable
+        {
+            add { m_onEnable += value; }
+            remove { m_onEnable -= value; }
+        }
+        public virtual event UnityAction onDisable
+        {
+            add { m_onDisable += value; }
+            remove { m_onDisable -= value; }
+        }
+
+        public abstract void Init();
 
         public abstract void Process(RenderTexture src, RenderTexture dest);
-        
+
 #if UNITY_EDITOR
 
+        public abstract string name { get; }
         private bool unfold = false;
 
         public void InspectorGUI()
