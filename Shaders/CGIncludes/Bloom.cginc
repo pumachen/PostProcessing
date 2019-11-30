@@ -22,7 +22,6 @@ float4 _FilterParams;
 fixed4 frag_DownSample(v2f_img i) : SV_Target
 {
 	fixed4 col = tex2D(_MainTex, i.uv);
-	//float brightness = Luminance(col.rgb);
 	float brightness = Max3(col.r, col.g, col.b);
 	return saturate(pow(brightness, 8)) * col;
 }
