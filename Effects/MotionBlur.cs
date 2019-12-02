@@ -7,20 +7,11 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class MotionBlur : PostProcessEffect
+    public class MotionBlur : PostProcessPass
     {
         protected override Shader shader
         {
-            get { return Shader.Find("Hidden/PostProcess/MotionBlur"); }
-        }
-        protected override Material material
-        {
-            get
-            {
-                if (m_material == null)
-                    m_material = new Material(shader);
-                return m_material;
-            }
+            get => Shader.Find("Hidden/PostProcess/MotionBlur");
         }
 
         [SerializeField]
@@ -137,7 +128,7 @@ namespace Omega.Rendering.PostProcessing
         }
 
 #if UNITY_EDITOR
-        public override string name { get { return "Motion Blur"; } }
+        public override string name { get => "Motion Blur"; }
 
         protected override void OnInspectorGUI()
         {

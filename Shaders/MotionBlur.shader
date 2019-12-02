@@ -3,7 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-		_MotionBlurFactor("Blur Factor", Range(0, 0.1)) = 0.05
+		//_MotionBlurFactor("Blur Factor", Range(0, 0.1)) = 0.05
     }
     SubShader
     {
@@ -19,7 +19,7 @@
 			#define DEPTH_TEXTURE
 
 			#include "UnityCG.cginc"
-			#include "CGIncludes/MotionBlur.cginc"
+			#include "../ShaderLibrary/MotionBlur.cginc"
 
             ENDCG
         }

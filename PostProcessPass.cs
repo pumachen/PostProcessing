@@ -1,50 +1,97 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using UnityEngine;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditorInternal;
 #endif //UNITY_EDITOR
 
 namespace Omega.Rendering.PostProcessing
 {
-    /*public class PostProcess
+    [System.Serializable]
+    public abstract class PostProcessPass
     {
-        public PostProcessEffect[] effects;
-        public MotionBlur motionBlur;
-        RenderTexture src;
-        RenderTexture dest;
-
-        protected void Awake()
+        [SerializeField]
+        private bool m_enabled = false;
+        public bool enabled
         {
-            motionBlur = new MotionBlur(material);
-            motionBlur.Init(material);
-            if (effects == null)
-                effects = new PostProcessEffect[] { motionBlur };
+            get { return m_enabled; }
+            set
+            {
+                if (value == m_enabled)
+                    return;
+                m_enabled = value;
+                if (value == true)
+                    OnEnable();
+                else
+                    OnDisable();
+            }
+        }
+        protected abstract Shader shader { get; }
+        protected Material m_material;
+        protected virtual Material material
+        {
+            get
+            {
+                if (m_material == null)
+                    m_material = new Material(shader);
+                return m_material;
+            }
         }
 
-        public void Process()
+        protected virtual void OnEnable()
         {
-            
+            Init();
+            m_onEnable?.Invoke();
         }
-    }
+        protected virtual void OnDisable()
+        {
+            m_onDisable?.Invoke();
+        }
+        private event UnityAction m_onEnable;
+        private event UnityAction m_onDisable;
+        public virtual event UnityAction onEnable
+        {
+            add { m_onEnable += value; }
+            remove { m_onEnable -= value; }
+        }
+        public virtual event UnityAction onDisable
+        {
+            add { m_onDisable += value; }
+            remove { m_onDisable -= value; }
+        }
+
+        public abstract void Init();
+
+        public abstract void Process(RenderTexture src, RenderTexture dest);
 
 #if UNITY_EDITOR
-    [CustomEditor(typeof(PostProcessPass))]
-    public class PostProcessStackEditor : Editor
-    {
-        new PostProcessPass target;
-        
-        private void OnEnable()
-        {
-            target = base.target as PostProcessPass;
-        }
 
-        public override void OnInspectorGUI()
+        public abstract string name { get; }
+        private bool unfold = false;
+
+        public void InspectorGUI()
         {
-            target.motionBlur.InspectorGUI();
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            
+            enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
+            EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
+            unfold = EditorGUILayout.Foldout(unfold, name);
+            GUILayout.EndHorizontal();
+
+            if (unfold)
+            {
+                OnInspectorGUI();
+            }
+            GUILayout.EndVertical();
         }
+        protected abstract void OnInspectorGUI();
+
+#endif //UNITY_EDITOR
     }
-#endif //UNITY_EDITOR*/
+
+    public enum PostProcessEffectMask : byte
+    {
+        ObjSpaceMotionBlur = 1 << 1,
+        ViewSpaceMotionBlur = 1 << 2
+    }
 }

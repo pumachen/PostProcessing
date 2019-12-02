@@ -20,12 +20,17 @@ namespace Omega.Rendering.PostProcessing
         [HideInInspector]
         Bloom bloom;
 
-        IEnumerable<PostProcessEffect> effects
+        [SerializeField]
+        [HideInInspector]
+        Uber uber;
+
+        IEnumerable<PostProcessPass> effects
         {
             get
             {
                 yield return motionBlur;
                 yield return bloom;
+                yield return uber;
             }
         }
 
@@ -41,7 +46,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        List<PostProcessEffect> enabledEffects = new List<PostProcessEffect>(2);
+        List<PostProcessPass> enabledEffects = new List<PostProcessPass>(2);
 
         protected void Start()
         {

@@ -316,7 +316,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!135 &261374641
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -409,7 +409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!65 &1544884309
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -502,7 +502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1616396339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -680,14 +680,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   motionBlur:
-    m_enabled: 1
+    m_enabled: 0
     m_mode: 0
-    m_space: 0
-    m_blurFactor: 0.0209
-    camera: {fileID: 1962570378}
-    targetTransform: {fileID: 1544884312}
+    m_space: 1
+    m_blurFactor: 0
+    camera: {fileID: 0}
+    targetTransform: {fileID: 0}
   bloom:
     m_enabled: 1
+    bloomParams:
+      m_maxMipLevel: 8
+      m_params: {x: 8, y: 0.11111111, z: 0, w: 0}
+  uber:
+    m_enabled: 0
 --- !u!20 &1962570378
 Camera:
   m_ObjectHideFlags: 0
@@ -763,7 +768,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!136 &2120637282
 CapsuleCollider:
   m_ObjectHideFlags: 0
