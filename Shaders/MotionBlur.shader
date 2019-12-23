@@ -3,7 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-		//_MotionBlurFactor("Blur Factor", Range(0, 0.1)) = 0.05
+		_MotionBlurFactor("Blur Factor", Range(0, 1)) = 0.05
     }
     SubShader
     {
@@ -15,11 +15,11 @@
             #pragma vertex vert_img
             #pragma fragment frag_MotionBlur
 
-			#define NUM_SAMPLERS 9
+			#define BLUR_STEPS 9
 			#define DEPTH_TEXTURE
 
 			#include "UnityCG.cginc"
-			#include "../ShaderLibrary/MotionBlur.cginc"
+			#include "CGIncludes/MotionBlur.cginc"
 
             ENDCG
         }

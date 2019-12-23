@@ -7,7 +7,7 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class Bloom : PostProcessPass
+    public class Bloom : PostProcessEffect
     {
         protected override Shader shader
         {

@@ -17,7 +17,7 @@ float4 _FilterParams;
 #define Scatter       _FilterParams.x
 #define ClampMax      _FilterParams.y
 #define Threshold     _FilterParams.z
-#define thresholdKnee _FilterParams.w
+#define ThresholdKnee _FilterParams.w
 
 #define FILTER_EXP    _FilterParams.x
 

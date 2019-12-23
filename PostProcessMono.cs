@@ -12,19 +12,18 @@ namespace Omega.Rendering.PostProcessing
     [ExecuteInEditMode]
     public class PostProcessMono : MonoBehaviour
     {
-        [SerializeField]
-        [HideInInspector]
-        MotionBlur motionBlur;
+        public static PostProcessMono instance;
 
-        [SerializeField]
         [HideInInspector]
-        Bloom bloom;
+        public MotionBlur motionBlur;
 
-        [SerializeField]
         [HideInInspector]
-        Uber uber;
+        public Bloom bloom;
 
-        IEnumerable<PostProcessPass> effects
+        [HideInInspector]
+        public Uber uber;
+
+        IEnumerable<PostProcessEffect> effects
         {
             get
             {
@@ -46,10 +45,11 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        List<PostProcessPass> enabledEffects = new List<PostProcessPass>(2);
+        List<PostProcessEffect> enabledEffects = new List<PostProcessEffect>(2);
 
         protected void Start()
         {
+            instance = this;
             foreach(var effect in effects)
             {
                 effect.onEnable += UpdateEffectList;
@@ -74,31 +74,32 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
+        public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            if (enabledEffects.Count == 0)
-            {
-                Graphics.Blit(src, dest);
-                return;
-            }
-            int passIdx = 0;
-            RenderTexture GetSrcRT()
-            {
-                if (passIdx % 2 == 0)
-                    return src;
-                return tmpBuffer;
-            }
-            RenderTexture GetDestRT()
-            {
-                if (passIdx == enabledEffects.Count - 1)
-                    return dest;
-                else
-                    return passIdx % 2 == 1 ? src : tmpBuffer;
-            }
-            for(passIdx = 0; passIdx < enabledEffects.Count; ++passIdx)
-            {
-                enabledEffects[passIdx].Process(GetSrcRT(), GetDestRT());
-            }
+             if (enabledEffects.Count == 0)
+             {
+                 Graphics.Blit(src, dest);
+                 return;
+             }
+             int passIdx = 0;
+             RenderTexture GetSrcRT()
+             {
+                 if (passIdx % 2 == 0)
+                     return src;
+                 return tmpBuffer;
+             }
+             RenderTexture GetDestRT()
+             {
+                 if (passIdx == enabledEffects.Count - 1)
+                     return dest;
+                 else
+                     return passIdx % 2 == 1 ? src : tmpBuffer;
+             }
+             for(passIdx = 0; passIdx < enabledEffects.Count; ++passIdx)
+             {
+                 enabledEffects[passIdx].Process(GetSrcRT(), GetDestRT());
+             }
+            //motionBlur.Process(src, dest);
         }
 
 #if UNITY_EDITOR
@@ -114,6 +115,7 @@ namespace Omega.Rendering.PostProcessing
 
             public override void OnInspectorGUI()
             {
+                PostProcessEffect.debugMode = EditorGUILayout.ToggleLeft("Debug", PostProcessEffect.debugMode);
                 foreach (var effect in target.effects)
                 {
                     effect.InspectorGUI();

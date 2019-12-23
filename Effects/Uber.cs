@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class Uber : PostProcessPass
+    public class Uber : PostProcessEffect
     {
         protected override Shader shader
         {

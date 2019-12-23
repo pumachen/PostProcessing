@@ -15,7 +15,7 @@
             #pragma fragment frag_DownSample
 
             #include "UnityCG.cginc"
-			#include "../ShaderLibrary/Bloom.cginc"
+			#include "CGIncludes/Bloom.cginc"
 
             ENDCG
         }
@@ -27,7 +27,7 @@
 			#pragma fragment frag_UpSample
 
 			#include "UnityCG.cginc"
-			#include "../ShaderLibrary/Bloom.cginc"
+			#include "CGIncludes/Bloom.cginc"
 
 			ENDCG
 		}

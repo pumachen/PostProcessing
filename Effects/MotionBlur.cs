@@ -7,7 +7,7 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class MotionBlur : PostProcessPass
+    public class MotionBlur : PostProcessEffect
     {
         protected override Shader shader
         {
@@ -18,18 +18,15 @@ namespace Omega.Rendering.PostProcessing
         private Mode m_mode = Mode.PositionReconstruction;
         public Mode mode
         {
-            get { return m_mode; }
-            set
-            {
-                m_mode = value;
-            }
+            get => m_mode;
+            set { m_mode = value; }
         }
 
         [SerializeField]
         private MotionSpace m_space = MotionSpace.World;
         public MotionSpace space
         {
-            get { return m_space; }
+            get => m_space;
             set { m_space = value; }
         }
 
@@ -37,13 +34,14 @@ namespace Omega.Rendering.PostProcessing
         private float m_blurFactor;
         public float blurFactor
         {
-            get { return m_blurFactor; }
+            get => m_blurFactor;
             set
             {
-                if (value == m_blurFactor)
-                    return;
-                m_blurFactor = value;
-                material.SetFloat("_MotionBlurFactor", value);
+                if (value != m_blurFactor)
+                {
+                    m_blurFactor = value;
+                    material.SetFloat("_MotionBlurFactor", value);
+                }
             }
         }
 
@@ -78,7 +76,7 @@ namespace Omega.Rendering.PostProcessing
         }
         Matrix4x4 matrix
         {
-            get { return space == MotionSpace.Local ? MVP : VP; }
+            get => space == MotionSpace.Local ? MVP : VP;
         }
         Matrix4x4 prevMatrix;
 
@@ -89,9 +87,9 @@ namespace Omega.Rendering.PostProcessing
                 enabled = false;
                 return;
             }
-            if (mode == Mode.PositionReconstruction && 
-                space == MotionSpace.Local && 
-                targetTransform == null)
+            if (mode  == Mode.PositionReconstruction
+             && space == MotionSpace.Local
+             && targetTransform == null)
             {
                 enabled = false;
                 return;
@@ -146,6 +144,12 @@ namespace Omega.Rendering.PostProcessing
                         break;
                     }
             }
+        }
+
+        protected override void OnDebugGUI()
+        {
+            base.OnDebugGUI();
+            EditorGUILayout.ObjectField("Material", material, typeof(Material), false);
         }
 #endif //UNITY_EDITOR
     }
