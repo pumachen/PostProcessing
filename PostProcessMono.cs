@@ -99,12 +99,11 @@ namespace Omega.Rendering.PostProcessing
              {
                  enabledEffects[passIdx].Process(GetSrcRT(), GetDestRT());
              }
-            //motionBlur.Process(src, dest);
         }
 
 #if UNITY_EDITOR
         [CustomEditor(typeof(PostProcessMono))]
-        public class PostProcessStackEditor : Editor
+        class PostProcessStackEditor : Editor
         {
             new PostProcessMono target;
 

@@ -15,7 +15,7 @@
             #pragma vertex vert_img
             #pragma fragment frag_MotionBlur
 
-			#define BLUR_STEPS 9
+			#define BLUR_STEPS 7.0
 			#define DEPTH_TEXTURE
 
 			#include "UnityCG.cginc"
