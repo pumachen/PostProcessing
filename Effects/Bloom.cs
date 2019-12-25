@@ -9,7 +9,19 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public class Bloom : PostProcessEffect
     {
-        protected override Shader shader
+        private Material m_material;
+        protected Material material
+        {
+            get
+            {
+                if (m_material == null)
+                {
+                    m_material = new Material(shader);
+                }
+                return m_material;
+            }
+        }
+        protected Shader shader
         {
             get => Shader.Find("Hidden/PostProcess/Bloom");
         }
@@ -66,10 +78,11 @@ namespace Omega.Rendering.PostProcessing
 
         public BloomParams bloomParams;
 
-        public override void Process(RenderTexture src, RenderTexture dest)
+        public override void Process(RenderTexture src)
         {
+            Shader.EnableKeyword("BLOOM_ENABLED");
             Graphics.Blit(src, bloomRT, material, 0);
-            Graphics.Blit(src, dest, material, 1);
+            //Graphics.Blit(src, dest, material, 1);
         }
 
         public override void Init()

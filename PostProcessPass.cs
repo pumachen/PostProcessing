@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,7 +9,7 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public abstract class PostProcessEffect : IPostProcess
+    public abstract class PostProcessPass
     {
         [SerializeField]
         private bool m_enabled = false;
@@ -26,9 +28,20 @@ namespace Omega.Rendering.PostProcessing
                 }
             }
         }
+        protected abstract Shader shader { get; }
+        protected Material m_material;
+        protected virtual Material material
+        {
+            get
+            {
+                if (m_material == null)
+                {
+                    m_material = new Material(shader);
+                }
+                return m_material;
+            }
+        }
 
-        protected Material uberMaterial;
-        
         private event UnityAction m_onEnable;
         private event UnityAction m_onDisable;
         public virtual event UnityAction onEnable
@@ -54,7 +67,7 @@ namespace Omega.Rendering.PostProcessing
 
         public abstract void Init();
 
-        public abstract void Process(RenderTexture src);
+        public abstract void Process(RenderTexture src, RenderTexture dest);
 
 #if UNITY_EDITOR
 
@@ -66,7 +79,7 @@ namespace Omega.Rendering.PostProcessing
         {
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
-            
+
             enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
             EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
             unfold = EditorGUILayout.Foldout(unfold, name);
@@ -75,7 +88,7 @@ namespace Omega.Rendering.PostProcessing
             if (unfold)
             {
                 OnInspectorGUI();
-                if(debugMode)
+                if (debugMode)
                 {
                     OnDebugGUI();
                 }
@@ -86,11 +99,5 @@ namespace Omega.Rendering.PostProcessing
         protected virtual void OnDebugGUI() { }
 
 #endif //UNITY_EDITOR
-    }
-
-    public enum PostProcessEffectMask : byte
-    {
-        ObjSpaceMotionBlur = 1 << 1,
-        ViewSpaceMotionBlur = 1 << 2
     }
 }

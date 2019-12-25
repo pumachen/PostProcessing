@@ -29,19 +29,14 @@ namespace Omega.Rendering.PostProcessing
             {
                 yield return motionBlur;
                 yield return bloom;
-                yield return uber;
             }
         }
 
-        RenderTexture m_tmpBuffer;
-
-        RenderTexture tmpBuffer
+        IEnumerable<PostProcessPass> passes
         {
             get
             {
-                if (m_tmpBuffer == null)
-                    m_tmpBuffer = new RenderTexture(2048, 1024, 0, RenderTextureFormat.ARGB32);
-                return m_tmpBuffer;
+                yield return uber;
             }
         }
 
@@ -76,34 +71,16 @@ namespace Omega.Rendering.PostProcessing
 
         public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-             if (enabledEffects.Count == 0)
-             {
-                 Graphics.Blit(src, dest);
-                 return;
-             }
-             int passIdx = 0;
-             RenderTexture GetSrcRT()
-             {
-                 if (passIdx % 2 == 0)
-                     return src;
-                 return tmpBuffer;
-             }
-             RenderTexture GetDestRT()
-             {
-                 if (passIdx == enabledEffects.Count - 1)
-                     return dest;
-                 else
-                     return passIdx % 2 == 1 ? src : tmpBuffer;
-             }
-             for(passIdx = 0; passIdx < enabledEffects.Count; ++passIdx)
-             {
-                 enabledEffects[passIdx].Process(GetSrcRT(), GetDestRT());
-             }
+            foreach(var effect in enabledEffects)
+            {
+                effect.Process(src);
+            }
+            uber.Process(src, dest);
         }
 
 #if UNITY_EDITOR
         [CustomEditor(typeof(PostProcessMono))]
-        class PostProcessStackEditor : Editor
+        class PostProcessMonoEditor : Editor
         {
             new PostProcessMono target;
 
@@ -115,9 +92,15 @@ namespace Omega.Rendering.PostProcessing
             public override void OnInspectorGUI()
             {
                 PostProcessEffect.debugMode = EditorGUILayout.ToggleLeft("Debug", PostProcessEffect.debugMode);
+                EditorGUILayout.LabelField("Effects");
                 foreach (var effect in target.effects)
                 {
                     effect.InspectorGUI();
+                }
+                EditorGUILayout.LabelField("Passes");
+                foreach (var pass in target.passes)
+                {
+                    pass.InspectorGUI();
                 }
             }
         }
