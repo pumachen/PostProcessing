@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _BloomTex ("BloomTex", 2D) = "black" {}
     }
     SubShader
     {
@@ -24,7 +25,7 @@
             {
                 fixed4 col = tex2D(_MainTex, i.uv);
             #if BLOOM_ENABLED
-                col = UpSample(_MainTex, i.uv);
+                col = ApplyBloom(col, i.uv);
             #endif
                 return col;
             }

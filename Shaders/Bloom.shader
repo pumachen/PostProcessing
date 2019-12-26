@@ -19,17 +19,5 @@
 
             ENDCG
         }
-
-		Pass
-		{
-			CGPROGRAM
-			#pragma vertex vert_img
-			#pragma fragment frag_UpSample
-
-			#include "UnityCG.cginc"
-			#include "CGIncludes/Bloom.cginc"
-
-			ENDCG
-		}
     }
 }

@@ -23,8 +23,10 @@ float4 _FilterParams;
 
 float4 _BloomParams;
 
-#define MIP_MAX       _BloomParams.x
-#define INV_STEPS     _BloomParams.y
+#define BLOOM_MIP_MIN   _BloomParams.x
+#define BLOOM_MIP_MAX   _BloomParams.y
+#define BLOOM_INV_STEPS _BloomParams.z
+#define BLOOM_INTENSITY _BloomParams.w
 
 fixed4 DownSample(sampler2D mainTex, float2 uv)
 {
@@ -38,34 +40,27 @@ fixed4 frag_DownSample(v2f_img i) : SV_Target
 	return DownSample(_MainTex, i.uv);
 }
 
-fixed4 UpSample(sampler2D _MainTex, float2 uv)
+fixed4 UpSample(float2 uv)
 {
 	float4 uvLod = float4(uv, 0, 0);
-	fixed4 col = tex2D(_MainTex, uv);
-	fixed4 brightness = 0;
-	for (int mip = 0; mip <= MIP_MAX; ++mip)
+	fixed4 bloom = 0;
+	for (int mip = BLOOM_MIP_MIN; mip <= BLOOM_MIP_MAX; ++mip)
 	{
 		uvLod.zw = mip;
-		brightness += tex2Dlod(_BloomTex, uvLod) * INV_STEPS;
+		bloom += tex2Dlod(_BloomTex, uvLod) * BLOOM_INV_STEPS;
 	}
-	return saturate(col + brightness);
+	return bloom;
 }
 
 fixed4 frag_UpSample(v2f_img i) : SV_Target
 {
-	return UpSample(_MainTex, i.uv);
+	return UpSample(i.uv);
 }
 
 fixed4 ApplyBloom(fixed4 col, float2 uv)
 {
-	float4 uvLod = float4(uv, 0, 0);
-	fixed4 brightness = 0;
-	for (int mip = 0; mip <= MIP_MAX; ++mip)
-	{
-		uvLod.zw = mip;
-		brightness += tex2Dlod(_BloomTex, uvLod) * INV_STEPS;
-	}
-	return saturate(col + brightness);
+	fixed4 bloom = UpSample(uv);
+	return saturate(col + BLOOM_INTENSITY * bloom);
 }
 
 #endif //POST_PROCESS_BLOOM_INCLUDED

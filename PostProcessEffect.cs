@@ -27,63 +27,74 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected Material uberMaterial;
-        
-        private event UnityAction m_onEnable;
-        private event UnityAction m_onDisable;
-        public virtual event UnityAction onEnable
+        private Material m_material;
+        protected Material material
         {
-            add { m_onEnable += value; }
-            remove { m_onEnable -= value; }
-        }
-        public virtual event UnityAction onDisable
-        {
-            add { m_onDisable += value; }
-            remove { m_onDisable -= value; }
+            get
+            {
+                if (m_material == null)
+                {
+                    m_material = new Material(shader);
+                }
+                return m_material;
+            }
         }
 
-        protected virtual void OnEnable()
-        {
-            Init();
-            m_onEnable?.Invoke();
-        }
-        protected virtual void OnDisable()
-        {
-            m_onDisable?.Invoke();
-        }
+        private Material m_destmat;
+        protected Material destMat => m_destmat;
 
-        public abstract void Init();
+        protected virtual Shader shader => null;
+
+        protected virtual void OnEnable()  {}
+        protected virtual void OnDisable() {}
+
+        public virtual void Init(Material destMat)
+        {
+            m_destmat = destMat;
+        }
 
         public abstract void Process(RenderTexture src);
 
 #if UNITY_EDITOR
 
         public abstract string name { get; }
-        private bool unfold = false;
+        private bool unfold = true;
         public static bool debugMode = false;
 
         public void InspectorGUI()
         {
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
-            
+            EditorGUILayout.BeginVertical();
+
+            EditorGUILayout.BeginHorizontal();
+
             enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
             EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
             unfold = EditorGUILayout.Foldout(unfold, name);
-            GUILayout.EndHorizontal();
 
-            if (unfold)
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(15f);
+            using (new GUILayout.VerticalScope())
             {
-                OnInspectorGUI();
-                if(debugMode)
+                if (unfold)
                 {
-                    OnDebugGUI();
+                    if (debugMode)
+                    {
+                        OnDebugGUI();
+                    }
+                    else
+                    {
+                        OnInspectorGUI();
+                    }
                 }
             }
-            GUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndVertical();
         }
         protected abstract void OnInspectorGUI();
-        protected virtual void OnDebugGUI() { }
+        protected virtual void OnDebugGUI() { OnInspectorGUI(); }
 
 #endif //UNITY_EDITOR
     }

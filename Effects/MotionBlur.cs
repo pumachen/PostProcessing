@@ -89,21 +89,14 @@ namespace Omega.Rendering.PostProcessing
                 enabled = false;
                 return;
             }
-            base.OnEnable();
-        }
-
-        public override void Init()
-        {
             camera.depthTextureMode = DepthTextureMode.Depth;
+            base.OnEnable();
         }
 
         public override void Process(RenderTexture src)
         {
             var matrix = this.matrix;
-            Shader.SetGlobalMatrix("_CurrentToPrevProjPos", prevMatrix * matrix.inverse);
-            
-            //Graphics.Blit(src, dest, material);
-
+            destMat.SetMatrix("_CurrentToPrevProjPos", prevMatrix * matrix.inverse);
             prevMatrix = matrix;
         }
 
@@ -141,11 +134,6 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected override void OnDebugGUI()
-        {
-            base.OnDebugGUI();
-            //EditorGUILayout.ObjectField("Material", material, typeof(Material), false);
-        }
 #endif //UNITY_EDITOR
     }
 }

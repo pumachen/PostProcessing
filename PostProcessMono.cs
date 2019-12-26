@@ -12,23 +12,17 @@ namespace Omega.Rendering.PostProcessing
     [ExecuteInEditMode]
     public class PostProcessMono : MonoBehaviour
     {
-        public static PostProcessMono instance;
-
-        [HideInInspector]
-        public MotionBlur motionBlur;
-
-        [HideInInspector]
-        public Bloom bloom;
-
-        [HideInInspector]
-        public Uber uber;
-
-        IEnumerable<PostProcessEffect> effects
-        {
+        [SerializeField]
+        protected Uber m_uber;
+        public Uber uber
+        { 
             get
             {
-                yield return motionBlur;
-                yield return bloom;
+                if(m_uber == null)
+                {
+                    m_uber = new Uber();
+                }
+                return m_uber;
             }
         }
 
@@ -40,41 +34,13 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        List<PostProcessEffect> enabledEffects = new List<PostProcessEffect>(2);
-
-        protected void Start()
+        protected void Awake()
         {
-            instance = this;
-            foreach(var effect in effects)
-            {
-                effect.onEnable += UpdateEffectList;
-                effect.onDisable += UpdateEffectList;
-            }
-            UpdateEffectList();
-            foreach(var effect in enabledEffects)
-            {
-                effect.Init();
-            }
-        }
-
-        protected void UpdateEffectList()
-        {
-            enabledEffects.Clear();
-            foreach(var effect in effects)
-            {
-                if (effect.enabled)
-                {
-                    enabledEffects.Add(effect);
-                }
-            }
+            uber.Init();
         }
 
         public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            foreach(var effect in enabledEffects)
-            {
-                effect.Process(src);
-            }
             uber.Process(src, dest);
         }
 
@@ -92,12 +58,6 @@ namespace Omega.Rendering.PostProcessing
             public override void OnInspectorGUI()
             {
                 PostProcessEffect.debugMode = EditorGUILayout.ToggleLeft("Debug", PostProcessEffect.debugMode);
-                EditorGUILayout.LabelField("Effects");
-                foreach (var effect in target.effects)
-                {
-                    effect.InspectorGUI();
-                }
-                EditorGUILayout.LabelField("Passes");
                 foreach (var pass in target.passes)
                 {
                     pass.InspectorGUI();

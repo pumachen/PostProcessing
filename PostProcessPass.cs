@@ -42,28 +42,10 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        private event UnityAction m_onEnable;
-        private event UnityAction m_onDisable;
-        public virtual event UnityAction onEnable
-        {
-            add { m_onEnable += value; }
-            remove { m_onEnable -= value; }
-        }
-        public virtual event UnityAction onDisable
-        {
-            add { m_onDisable += value; }
-            remove { m_onDisable -= value; }
-        }
+        public abstract IEnumerable<PostProcessEffect> effects { get; }
 
-        protected virtual void OnEnable()
-        {
-            Init();
-            m_onEnable?.Invoke();
-        }
-        protected virtual void OnDisable()
-        {
-            m_onDisable?.Invoke();
-        }
+        protected virtual void OnEnable()  {}
+        protected virtual void OnDisable() {}
 
         public abstract void Init();
 
@@ -72,32 +54,36 @@ namespace Omega.Rendering.PostProcessing
 #if UNITY_EDITOR
 
         public abstract string name { get; }
-        private bool unfold = false;
-        public static bool debugMode = false;
+        private bool unfold = true;
+        public bool debugMode = false;
 
         public void InspectorGUI()
         {
-            GUILayout.BeginVertical();
-            GUILayout.BeginHorizontal();
-
-            enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
-            EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
-            unfold = EditorGUILayout.Foldout(unfold, name);
-            GUILayout.EndHorizontal();
-
-            if (unfold)
+            using (new GUILayout.HorizontalScope())
             {
-                OnInspectorGUI();
-                if (debugMode)
+                EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
+                EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
+                unfold = EditorGUILayout.Foldout(unfold, name);
+            }
+
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Space(15f); // horizontal indent size of 20 (pixels)
+                if (unfold)
                 {
-                    OnDebugGUI();
+                    using (new GUILayout.VerticalScope())
+                    {
+                        OnInspectorGUI();
+                        foreach (var effect in effects)
+                        {
+                            effect.InspectorGUI();
+                        }
+                    }
                 }
             }
-            GUILayout.EndVertical();
         }
         protected abstract void OnInspectorGUI();
-        protected virtual void OnDebugGUI() { }
-
 #endif //UNITY_EDITOR
     }
 }

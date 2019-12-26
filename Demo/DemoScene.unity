@@ -679,20 +679,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98da893204fc5ad43a74116c24e63fcd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motionBlur:
-    m_enabled: 1
-    m_mode: 0
-    m_space: 0
-    m_blurFactor: 0.1
-    camera: {fileID: 1962570378}
-    targetTransform: {fileID: 1544884312}
-  bloom:
+  m_uber:
     m_enabled: 0
-    bloomParams:
-      m_maxMipLevel: 8
-      m_params: {x: 8, y: 0.11111111, z: 0, w: 0}
-  uber:
-    m_enabled: 0
+    debugMode: 0
+    motionBlur:
+      m_enabled: 0
+      m_mode: 0
+      m_space: 1
+      m_blurFactor: 0
+      camera: {fileID: 0}
+      targetTransform: {fileID: 0}
+    bloom:
+      m_enabled: 1
+      bloomTex:
+        m_resolutionMode: 1
+        m_scale: 1
+        m_resolution: {x: 512, y: 256}
+        m_format: 7
+        m_useMipMap: 0
+      bloomParams:
+        m_filterExp: 1
+        m_minMipLevel: 1
+        m_maxMipLevel: 3
 --- !u!20 &1962570378
 Camera:
   m_ObjectHideFlags: 0

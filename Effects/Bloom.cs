@@ -9,148 +9,41 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public class Bloom : PostProcessEffect
     {
-        private Material m_material;
-        protected Material material
-        {
-            get
-            {
-                if (m_material == null)
-                {
-                    m_material = new Material(shader);
-                }
-                return m_material;
-            }
-        }
-        protected Shader shader
+        protected override Shader shader
         {
             get => Shader.Find("Hidden/PostProcess/Bloom");
         }
 
-        public RenderTexture bloomRT
-        {
-            get
-            {
-                if(m_bloomRT == null)
-                {
-                    CreateBloomTex();
-                }
-                return m_bloomRT;
-            }
-            protected set
-            {
-                if (m_bloomRT != null)
-                {
-                    m_bloomRT.Release();
-                }
-                m_bloomRT = value;
-            }
-        }
-        private RenderTexture m_bloomRT;
+        public BufferRT bloomTex = new BufferRT();
 
-        public Vector2Int bloomTexSize
-        {
-            get => m_bloomTexSize;
-            set
-            {
-                if (value == m_bloomTexSize)
-                    return;
-                if(Mathf.IsPowerOfTwo(value.x) && Mathf.IsPowerOfTwo(value.y))
-                {
-                    m_bloomTexSize = value;
-                    CreateBloomTex();
-                }
-            }
-        }
-        private Vector2Int m_bloomTexSize = new Vector2Int(512, 256);
+        public BloomParams bloomParams = new BloomParams();
 
-        public Vector4 filterParams
+        protected override void OnEnable()
         {
-            get => m_filterParams;
-            set
-            {
-                if (value == m_filterParams)
-                    return;
-                m_filterParams = value;
-                material.SetVector("_FilterParams", m_filterParams);
-            }
+            base.OnEnable();
+            destMat.EnableKeyword("BLOOM_ENABLED");
         }
-        private Vector4 m_filterParams;
 
-        public BloomParams bloomParams;
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            destMat.DisableKeyword("BLOOM_ENABLED");
+        }
 
         public override void Process(RenderTexture src)
         {
-            Shader.EnableKeyword("BLOOM_ENABLED");
-            Graphics.Blit(src, bloomRT, material, 0);
-            //Graphics.Blit(src, dest, material, 1);
+            Graphics.Blit(src, bloomTex, material);
         }
 
-        public override void Init()
+        public override void Init(Material dest)
         {
-            Shader.SetGlobalTexture("_BloomTex", bloomRT);
-            bloomParams.onValueChange += (param) =>
-            {
-                Shader.SetGlobalVector("_BloomParams", param);
-            };
-            material.SetVector("_FilterParams", filterParams);
-        }
+            base.Init(dest);
 
-        protected void CreateBloomTex()
-        {
-            bloomRT = new RenderTexture(bloomTexSize.x, bloomTexSize.y, 0)
-            {
-                useMipMap = true,
-                filterMode = FilterMode.Bilinear
-            };
-        }
+            dest.SetTexture("_BloomTex", bloomTex);
+            bloomTex.onValueChange += () => dest.SetTexture("_BloomTex", bloomTex);
 
-        [System.Serializable]
-        public class BloomParams
-        {
-            protected event UnityAction<Vector4> m_onValueChange;
-            public event UnityAction<Vector4> onValueChange
-            {
-                add
-                {
-                    m_onValueChange += value;
-                    value?.Invoke(m_params);
-                }
-                remove => m_onValueChange -= value;
-            }
-
-            [SerializeField]
-            protected uint m_maxMipLevel = 1;
-            public uint maxMipLevel
-            {
-                get => m_maxMipLevel;
-                set
-                {
-                    if (value == m_maxMipLevel)
-                        return;
-                    m_maxMipLevel = value;
-                    UpdateParams();
-                }
-            }
-
-            [SerializeField]
-            protected Vector4 m_params;
-
-            protected void UpdateParams()
-            {
-                m_params = new Vector4()
-                {
-                    x = maxMipLevel,
-                    y = 1f / (1 + maxMipLevel),
-                    z = 0,
-                    w = 0
-                };
-                m_onValueChange?.Invoke(m_params);
-            }
-
-            public static implicit operator Vector4(BloomParams bloomParams)
-            {
-                return bloomParams.m_params;
-            }
+            bloomParams.bloomParamsChanged += (param) => dest.SetVector("_BloomParams", param);
+            bloomParams.filterParamsChanged += (param) => material.SetVector("_FilterParams", param);
         }
 
 #if UNITY_EDITOR
@@ -158,17 +51,173 @@ namespace Omega.Rendering.PostProcessing
 
         protected override void OnInspectorGUI()
         {
-            EditorGUILayout.ObjectField(bloomRT, typeof(RenderTexture), true);
-            bloomTexSize = EditorGUILayout.Vector2IntField("", bloomTexSize);
-            float filterExp = EditorGUILayout.Slider("Filter Exp", filterParams.x, 1f, 10f);
-            filterParams = new Vector4(filterExp, 0, 0, 0);
-            bloomParams.maxMipLevel = 
-                (uint)(EditorGUILayout.IntSlider(
-                    "Max Mipmap Level", 
-                    (int)bloomParams.maxMipLevel, 
-                    0, 
-                    bloomRT.mipmapCount));
+            BloomParamsGUI();
+            bloomTex.OnGUI();
+        }
+
+        protected override void OnDebugGUI()
+        {
+            BloomParamsGUI();
+            bloomTex.OnDebugGUI();
+        }
+
+        void BloomParamsGUI()
+        {
+            EditorGUILayout.LabelField("BloomParams");
+            using (new GUILayout.HorizontalScope())
+            {
+                EditorGUILayout.Space(5f);
+                using (new GUILayout.VerticalScope())
+                {
+                    bloomParams.filterExp = EditorGUILayout.Slider("Filter Exp", bloomParams.filterExp, 1f, 10f);
+                    bloomParams.minMipLevel = EditorGUILayout.
+                        IntSlider(
+                            "Min Mipmap Level",
+                            bloomParams.minMipLevel,
+                            1,
+                            bloomParams.maxMipLevel);
+                    bloomParams.maxMipLevel = EditorGUILayout.
+                        IntSlider(
+                            "Max Mipmap Level",
+                            bloomParams.maxMipLevel,
+                            1,
+                            bloomTex.RT.mipmapCount);
+                    bloomParams.intensity = EditorGUILayout.
+                        Slider("Intensity", bloomParams.intensity, 0, 1);
+                }
+            }
         }
 #endif //UNITY_EDITOR
+    }
+
+    [System.Serializable]
+    public class BloomParams
+    {
+        protected event UnityAction<Vector4> m_bloomParamsChanged;
+        public event UnityAction<Vector4> bloomParamsChanged
+        {
+            add
+            {
+                if (value != null)
+                {
+                    m_bloomParamsChanged += value;
+                    value.Invoke(bloomParams);
+                }
+            }
+            remove => m_bloomParamsChanged -= value;
+        }
+
+        #region FilterParams
+        protected event UnityAction<Vector4> m_filterParamsChanged;
+        public event UnityAction<Vector4> filterParamsChanged
+        {
+            add
+            {
+                if (value != null)
+                {
+                    m_filterParamsChanged += value;
+                    value.Invoke(filterParams);
+                }
+            }
+            remove => m_filterParamsChanged -= value;
+        }
+
+        [SerializeField]
+        private float m_filterExp = 1.0f;
+        public float filterExp
+        {
+            get => m_filterExp;
+            set
+            {
+                if (value != m_filterExp)
+                {
+                    m_filterExp = value;
+                    UpdateFilterParams();
+                }
+            }
+        }
+
+        private Vector4 m_filterParams;
+        public Vector4 filterParams => m_filterParams;
+        private void UpdateFilterParams()
+        {
+            m_filterParams = new Vector4()
+            {
+                x = filterExp,
+                y = 0,
+                z = 0,
+                w = 0
+            };
+            m_filterParamsChanged?.Invoke(filterParams);
+        }
+        #endregion //FilterParams
+
+        #region BloomParams
+        [SerializeField]
+        private int m_minMipLevel = 1;
+        public int minMipLevel
+        {
+            get => m_minMipLevel;
+            set
+            {
+                if (value != m_minMipLevel)
+                {
+                    m_minMipLevel = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+        [SerializeField]
+        private int m_maxMipLevel = 3;
+        public int maxMipLevel
+        {
+            get => m_maxMipLevel;
+            set
+            {
+                if (value != m_maxMipLevel)
+                {
+                    m_maxMipLevel = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+        private float m_intensity = 0.5f;
+        public float intensity
+        {
+            get => m_intensity;
+            set
+            {
+                if (value != m_intensity)
+                {
+                    m_intensity = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+
+        private Vector4 m_bloomParams;
+        public Vector4 bloomParams => m_bloomParams;
+
+        private void UpdateBloomParams()
+        {
+            m_bloomParams = new Vector4()
+            {
+                x = minMipLevel,
+                y = maxMipLevel,
+                z = 1f / (maxMipLevel - minMipLevel + 1),
+                w = intensity
+            };
+            m_bloomParamsChanged?.Invoke(bloomParams);
+        }
+        #endregion //BloomParams
+
+        public BloomParams()
+        {
+            UpdateFilterParams();
+            UpdateBloomParams();
+        }
     }
 }
