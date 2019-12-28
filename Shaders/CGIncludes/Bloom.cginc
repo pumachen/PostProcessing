@@ -1,5 +1,5 @@
-#ifndef POST_PROCESS_BLOOM_INCLUDED
-#define POST_PROCESS_BLOOM_INCLUDED
+#ifndef BLOOM_INCLUDED
+#define BLOOM_INCLUDED
 
 #define Max3(a,b,c) max(max((a),(b)),(c))
 
@@ -63,4 +63,4 @@ fixed4 ApplyBloom(fixed4 col, float2 uv)
 	return saturate(col + BLOOM_INTENSITY * bloom);
 }
 
-#endif //POST_PROCESS_BLOOM_INCLUDED
+#endif //BLOOM_INCLUDED

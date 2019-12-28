@@ -14,7 +14,8 @@ namespace Omega.Rendering.PostProcessing
             get => Shader.Find("Hidden/PostProcess/Bloom");
         }
 
-        public BufferRT bloomTex = new BufferRT();
+        public BufferRT bloomTex = 
+            new BufferRT(0.5f, RenderTextureFormat.ARGB32, true);
 
         public BloomParams bloomParams = new BloomParams();
 

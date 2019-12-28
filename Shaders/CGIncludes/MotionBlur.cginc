@@ -1,5 +1,5 @@
-#ifndef POST_PROCESS_MOTION_BLUR_INCLUDED
-#define POST_PROCESS_MOTION_BLUR_INCLUDED
+#ifndef MOTION_BLUR_INCLUDED
+#define MOTION_BLUR_INCLUDED
 
 sampler2D _MainTex;
 
@@ -70,4 +70,4 @@ fixed4 MotionBlur(sampler2D mainTex, float2 uv)
 	}
 	return col;
 }
-#endif //POST_PROCESS_MOTION_BLUR_INCLUDED
+#endif //MOTION_BLUR_INCLUDED

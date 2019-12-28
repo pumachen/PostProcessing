@@ -128,7 +128,7 @@ namespace Omega.Rendering.PostProcessing
                 mipCount = (int)Mathf.Log(Mathf.Max(res.x, res.y), 2);
             }
             m_RT = new RenderTexture(res.x, res.y, 0, format, mipCount);
-            m_RT.useMipMap = true;
+            m_RT.useMipMap = m_useMipMap;
             onValueChange?.Invoke();
 
             if (oldRT != null)
@@ -136,6 +136,28 @@ namespace Omega.Rendering.PostProcessing
                 oldRT.Release();
                 Object.DestroyImmediate(oldRT);
             }
+        }
+
+        public BufferRT(
+            Resolution resolution,
+            RenderTextureFormat format = RenderTextureFormat.Default, 
+            bool useMipMap = false)
+        {
+            m_resolution = new Vector2Int(resolution.width, resolution.height);
+            m_resolutionMode = ResolutionMode.Absolute;
+            m_format = format;
+            m_useMipMap = useMipMap;
+        }
+
+        public BufferRT(
+            float scale, 
+            RenderTextureFormat format = RenderTextureFormat.Default, 
+            bool useMipMap = false)
+        {
+            m_resolutionMode = ResolutionMode.Relative;
+            m_scale = scale;
+            m_format = format;
+            m_useMipMap = useMipMap;
         }
 
         public static implicit operator RenderTexture(BufferRT bufferRT)
@@ -160,6 +182,10 @@ namespace Omega.Rendering.PostProcessing
         public void OnDebugGUI()
         {
             OnGUI();
+            
+            format = (RenderTextureFormat)EditorGUILayout.EnumPopup("Format", format);
+            useMipMap = EditorGUILayout.Toggle("MipMap", useMipMap);
+
             float width = EditorGUIUtility.currentViewWidth * 0.9f;
             float aspect = (float)RT.height / RT.width;
             float height = width * aspect;
