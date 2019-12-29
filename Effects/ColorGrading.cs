@@ -7,23 +7,23 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class ColorGrading : PostProcessEffect
+    public class ColorLookUp : PostProcessEffect
     {
         protected override Shader shader
         {
-            get => Shader.Find("Hidden/PostProcess/ColorGrading");
+            get => Shader.Find("Hidden/PostProcess/ColorLookUp");
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            destMat.EnableKeyword("COLORGRADING_ENABLED");
+            destMat.EnableKeyword("COLORLOOKUP_ENABLED");
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            destMat.DisableKeyword("COLORGRADING_ENABLED");
+            destMat.DisableKeyword("COLORLOOKUP_ENABLED");
         }
 
         public override void Process(RenderTexture src)
@@ -37,10 +37,11 @@ namespace Omega.Rendering.PostProcessing
         }
 
 #if UNITY_EDITOR
-        public override string name { get => "Bloom"; }
+        public override string name { get => "Color LookUp"; }
 
         protected override void OnInspectorGUI()
         {
+
         }
 
         protected override void OnDebugGUI()

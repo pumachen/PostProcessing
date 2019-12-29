@@ -27,6 +27,21 @@ namespace Omega.Rendering.PostProcessing
         }
 
         [SerializeField]
+        protected Camera m_camera;
+        public Camera camera
+        {
+            get => m_camera;
+            set
+            {
+                if(m_camera != value)
+                {
+                    m_camera = value;
+                    UpdateRT();
+                }
+            }
+        }
+
+        [SerializeField]
         protected float m_scale = 1.0f;
         public float scale
         {
@@ -54,11 +69,23 @@ namespace Omega.Rendering.PostProcessing
                 }
                 else
                 {
-                    Resolution screenRes = Screen.currentResolution;
+                    Resolution res;
+                    if (camera == null)
+                    {
+                        res = new Resolution()
+                        {
+                            width = camera.pixelWidth,
+                            height = camera.pixelHeight
+                        };
+                    }
+                    else
+                    {
+                        res = Screen.currentResolution;
+                    }
                     return new Vector2Int()
                     {
-                        x = Mathf.Max(1, (int)(screenRes.width  * scale)),
-                        y = Mathf.Max(1, (int)(screenRes.height * scale))
+                        x = Mathf.Max(1, (int)(res.width  * scale)),
+                        y = Mathf.Max(1, (int)(res.height * scale))
                     };
                 }
             }
@@ -175,6 +202,7 @@ namespace Omega.Rendering.PostProcessing
             }
             else
             {
+                camera = EditorGUILayout.ObjectField("Camera", camera, typeof(Camera), true) as Camera;
                 scale = EditorGUILayout.Slider("Scale", scale, 0, 1);
             }
         }
