@@ -51,6 +51,10 @@ namespace Omega.Rendering.PostProcessing
         public virtual void Init(Material destMat)
         {
             m_destmat = destMat;
+            if (m_enabled)
+                OnEnable();
+            else
+                OnDisable();
         }
 
         public abstract void Process(RenderTexture src);
