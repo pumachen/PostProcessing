@@ -70,7 +70,7 @@ namespace Omega.Rendering.PostProcessing
                 else
                 {
                     Resolution res;
-                    if (camera == null)
+                    if (camera != null)
                     {
                         res = new Resolution()
                         {

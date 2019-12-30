@@ -184,6 +184,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
         private float m_intensity = 0.5f;
         public float intensity
         {
