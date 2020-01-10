@@ -7,28 +7,30 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public class ColorLookUp : PostProcessEffect
+    public class ColorGrading : PostProcessEffect
     {
-        protected override Shader shader
+        [SerializeField]
+        protected Texture2D m_LUT;
+        public Texture2D LUT
         {
-            get => Shader.Find("Hidden/PostProcess/ColorLookUp");
+            get => m_LUT;
+            set
+            {
+                m_LUT = value;
+                destMat.SetTexture("_LUT", value);
+            }
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
-            destMat.EnableKeyword("COLORLOOKUP_ENABLED");
+            destMat.EnableKeyword("COLORGRADING_ENABLED");
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            destMat.DisableKeyword("COLORLOOKUP_ENABLED");
-        }
-
-        public override void Process(RenderTexture src)
-        {
-
+            destMat.DisableKeyword("COLORGRADING_ENABLED");
         }
 
         public override void Init(Material dest)
@@ -37,15 +39,11 @@ namespace Omega.Rendering.PostProcessing
         }
 
 #if UNITY_EDITOR
-        public override string name { get => "Color LookUp"; }
+        public override string name { get => "Color Grading"; }
 
         protected override void OnInspectorGUI()
         {
-
-        }
-
-        protected override void OnDebugGUI()
-        {
+            LUT = EditorGUILayout.ObjectField("LUT", LUT, typeof(Texture2D), false) as Texture2D;
         }
 #endif //UNITY_EDITOR
     }

@@ -57,7 +57,7 @@ namespace Omega.Rendering.PostProcessing
                 OnDisable();
         }
 
-        public abstract void Process(RenderTexture src);
+        public virtual void Process(RenderTexture src) {}
 
 #if UNITY_EDITOR
 

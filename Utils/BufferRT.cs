@@ -125,7 +125,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_useMipMap != value)
                 {
                     m_useMipMap = value;
-                    RT.useMipMap = value;
+                    UpdateRT();
                 }
             }
         }
@@ -149,12 +149,11 @@ namespace Omega.Rendering.PostProcessing
         {
             var oldRT = m_RT;
             Vector2Int res = resolution;
-            int mipCount = 0;
-            if (useMipMap)
+            RenderTextureDescriptor descriptor = new RenderTextureDescriptor(res.x, res.y, format, 0)
             {
-                mipCount = (int)Mathf.Log(Mathf.Max(res.x, res.y), 2);
-            }
-            m_RT = new RenderTexture(res.x, res.y, 0, format, mipCount);
+                useMipMap = useMipMap,
+            };
+            m_RT = new RenderTexture(descriptor);
             m_RT.useMipMap = m_useMipMap;
             onValueChange?.Invoke();
 

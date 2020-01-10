@@ -42,14 +42,33 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        public abstract IEnumerable<PostProcessEffect> effects { get; }
+        protected abstract IEnumerable<PostProcessEffect> effects { get; }
+        protected List<PostProcessEffect> effectList;
 
         protected virtual void OnEnable()  {}
         protected virtual void OnDisable() {}
 
-        public abstract void Init();
+        public virtual void Init()
+        {
+            effectList = new List<PostProcessEffect>(10);
+            foreach(var effect in effects)
+            {
+                effectList.Add(effect);
+                effect.Init(material);
+            }
+        }
 
-        public abstract void Process(RenderTexture src, RenderTexture dest);
+        public virtual void Process(RenderTexture src, RenderTexture dest)
+        {
+            foreach (PostProcessEffect effect in effectList)
+            {
+                if (effect.enabled)
+                {
+                    effect.Process(src);
+                }
+            }
+            Graphics.Blit(src, dest, material);
+        }
 
 #if UNITY_EDITOR
 
@@ -75,7 +94,7 @@ namespace Omega.Rendering.PostProcessing
                     using (new GUILayout.VerticalScope())
                     {
                         OnInspectorGUI();
-                        foreach (var effect in effects)
+                        foreach (var effect in effectList)
                         {
                             effect.InspectorGUI();
                         }

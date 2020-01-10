@@ -7,43 +7,30 @@ namespace Omega.Rendering.PostProcessing
     [System.Serializable]
     public class Uber : PostProcessPass
     {
-        protected MotionBlur m_motionBlur;
-        protected Bloom m_bloom;
+        [SerializeField]
+        protected MotionBlur m_motionBlur = new MotionBlur();
+        public MotionBlur motionBlur => m_motionBlur;
 
-        public MotionBlur motionBlur = new MotionBlur();
-        public Bloom bloom = new Bloom();
-        public override IEnumerable<PostProcessEffect> effects
+        [SerializeField]
+        protected FastBloom m_bloom = new FastBloom();
+        public FastBloom bloom => m_bloom;
+
+        [SerializeField]
+        protected ColorGrading m_colorGrading = new ColorGrading();
+        public ColorGrading colorGrading => m_colorGrading;
+        protected override IEnumerable<PostProcessEffect> effects
         {
             get
             {
                 yield return motionBlur;
                 yield return bloom;
+                yield return colorGrading;
             }
         }
 
         protected override Shader shader
         {
             get => Shader.Find("Hidden/PostProcess/Uber");
-        }
-
-        public override void Init()
-        {
-            foreach (var effect in effects)
-            {
-                effect.Init(material);
-            }
-        }
-
-        public override void Process(RenderTexture src, RenderTexture dest)
-        {
-            foreach (var effect in effects)
-            {
-                if(effect.enabled)
-                {
-                    effect.Process(src);
-                }
-            }
-            Graphics.Blit(src, dest, material);
         }
 
 #if UNITY_EDITOR

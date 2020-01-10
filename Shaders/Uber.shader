@@ -13,11 +13,14 @@
         {
             CGPROGRAM
             #pragma multi_compile BLOOM_ENABLED _
+            #pragma multi_compile COLORGRADING_ENABLED _
             #pragma vertex vert_img
             #pragma fragment frag
 
             #include "UnityCG.cginc"
 			#include "CGIncludes/Bloom.cginc"
+            //#include "CGIncludes/MotionBlur.cginc"
+            #include "CGIncludes/ColorGrading.cginc"
 
             //sampler2D _MainTex;
 
@@ -26,6 +29,10 @@
                 fixed4 col = tex2D(_MainTex, i.uv);
             #if BLOOM_ENABLED
                 col = ApplyBloom(col, i.uv);
+            #endif
+
+            #if COLORGRADING_ENABLED
+                col = ApplyLut(col);
             #endif
                 return col;
             }

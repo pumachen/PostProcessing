@@ -690,17 +690,22 @@ MonoBehaviour:
       camera: {fileID: 0}
       targetTransform: {fileID: 0}
     bloom:
-      m_enabled: 1
+      m_enabled: 0
       bloomTex:
-        m_resolutionMode: 1
-        m_scale: 1
+        m_resolutionMode: 0
+        m_camera: {fileID: 0}
+        m_scale: 0.5
         m_resolution: {x: 512, y: 256}
-        m_format: 7
-        m_useMipMap: 0
+        m_format: 0
+        m_useMipMap: 1
       bloomParams:
         m_filterExp: 1
         m_minMipLevel: 1
-        m_maxMipLevel: 3
+        m_maxMipLevel: 10
+        m_intensity: 1
+    colorGrading:
+      m_enabled: 1
+      m_LUT: {fileID: 2800000, guid: 1f76d7cba2a32f9418a1783e1fb9e100, type: 3}
 --- !u!20 &1962570378
 Camera:
   m_ObjectHideFlags: 0
@@ -710,7 +715,7 @@ Camera:
   m_GameObject: {fileID: 1962570375}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 2
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

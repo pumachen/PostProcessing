@@ -39,17 +39,6 @@ namespace Omega.Rendering.PostProcessing
         protected void Awake()
         {
             uber.Init();
-            RenderPipelineManager.endCameraRendering += OnEndRendering;
-        }
-
-        void OnEndRendering(ScriptableRenderContext context, Camera camera)
-        {
-            if(camera == Camera.main)
-            {
-                OnRenderImage(
-                    DeferredRP<PBRGBuffer>.instance.GetFrameBuffer(camera), 
-                    camera.targetTexture);
-            }
         }
 
         public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)

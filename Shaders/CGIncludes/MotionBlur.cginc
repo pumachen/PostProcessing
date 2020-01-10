@@ -1,7 +1,7 @@
 #ifndef MOTION_BLUR_INCLUDED
 #define MOTION_BLUR_INCLUDED
 
-sampler2D _MainTex;
+//sampler2D _MainTex;
 
 #ifdef DEPTH_TEXTURE
 sampler2D _CameraDepthTexture;
@@ -35,7 +35,7 @@ fixed4 frag_MotionBlur(v2f_img i) : SV_Target
 		for (int blurStep = 1; blurStep < BLUR_STEPS; ++blurStep)
 		{
 			uv += dv;
-			col += tex2D(_MainTex, uv);
+			col += tex2D(_MainTex, uv, 0, 0);
 		}
 		col /= BLUR_STEPS;
 	}

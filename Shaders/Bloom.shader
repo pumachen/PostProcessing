@@ -1,4 +1,4 @@
-﻿Shader "Hidden/PostProcess/Bloom"
+﻿Shader "Hidden/PostProcess/FastBloom"
 {
     Properties
     {

@@ -1,90 +1,77 @@
-#ifndef COLORGRADIING_INCLUDED
-#define COLORGRADIING_INCLUDED
+#ifndef COLOR_INCLUDED
+#define COLOR_INCLUDED
 
-struct ParamsLogC
-{
-	half cut;
-	half a;
-    half b;
-    half c;
-    half d;
-    half e;
-    half f;
-};
+#include "StdLib.cginc"
 
-static const ParamsLogC LogC = 
-{
-    0.011361, // cut
-    5.555556, // a
-    0.047996, // b
-    0.244161, // c
-    0.386036, // d
-    5.301883, // e
-    0.092819  // f
-};
+//
+// sRGB transfer functions
+// Fast path ref: http://chilliant.blogspot.com.au/2012/08/srgb-approximations-for-hlsl.html?m=1
+//
 
-half LinearToLogC(half x)
+half SRGBToLinear(half c)
 {
-    return LogC.c * log10(LogC.a * x + LogC.b) + LogC.d;
+#ifdef USE_VERY_FAST_SRGB
+    return c * c;
+#elif USE_FAST_SRGB
+    return c * (c * (c * 0.305306011 + 0.682171111) + 0.012522878);
+#else
+    half linearRGBLo = c / 12.92;
+    half linearRGBHi = PositivePow((c + 0.055) / 1.055, 2.4);
+    half linearRGB = (c <= 0.04045) ? linearRGBLo : linearRGBHi;
+    return linearRGB;
+#endif
 }
 
-half LinearToLogC_Precise(half x)
+half3 SRGBToLinear(half3 c)
 {
-    if(x >  LogC.cut)
-        return LogC.c * log10(LogC.a * x + LogC.b) + LogC.d;
-    else
-        return LogC.e * x + LogC.f;
+#ifdef USE_VERY_FAST_SRGB
+    return c * c;
+#elif USE_FAST_SRGB
+    return c * (c * (c * 0.305306011 + 0.682171111) + 0.012522878);
+#else
+    half3 linearRGBLo = c / 12.92;
+    half3 linearRGBHi = PositivePow((c + 0.055) / 1.055, half3(2.4, 2.4, 2.4));
+    half3 linearRGB = (c <= 0.04045) ? linearRGBLo : linearRGBHi;
+    return linearRGB;
+#endif
 }
 
-half3 LinearToLogC(half3 col)
+half4 SRGBToLinear(half4 c)
 {
-    return LogC.c * log10(LogC.a * col + LogC.b) + LogC.d;
+    return half4(SRGBToLinear(c.rgb), c.a);
 }
 
-half3 LinearToLogC_Precise(half3 col)
+half LinearToSRGB(half c)
 {
-    return half3(
-        LinearToLogC_Precise(col.x),
-        LinearToLogC_Precise(col.y),
-        LinearToLogC_Precise(col.z)
-    );
+#ifdef USE_VERY_FAST_SRGB
+    return sqrt(c);
+#elif USE_FAST_SRGB
+    return max(1.055 * PositivePow(c, 0.416666667) - 0.055, 0.0);
+#else
+    half sRGBLo = c * 12.92;
+    half sRGBHi = (PositivePow(c, 1.0 / 2.4) * 1.055) - 0.055;
+    half sRGB = (c <= 0.0031308) ? sRGBLo : sRGBHi;
+    return sRGB;
+#endif
 }
 
-half LogCToLinear(half x)
+half3 LinearToSRGB(half3 c)
 {
-    return (pow(10.0, (x - LogC.d) / LogC.c) - LogC.b) / LogC.a;
+#ifdef USE_VERY_FAST_SRGB
+    return sqrt(c);
+#elif USE_FAST_SRGB
+    return max(1.055 * PositivePow(c, 0.416666667) - 0.055, 0.0);
+#else
+    half3 sRGBLo = c * 12.92;
+    half3 sRGBHi = (PositivePow(c, half3(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4)) * 1.055) - 0.055;
+    half3 sRGB = (c <= 0.0031308) ? sRGBLo : sRGBHi;
+    return sRGB;
+#endif
 }
 
-half LogCToLinear_Precise(half x)
+half4 LinearToSRGB(half4 c)
 {
-    if (x > LogC.e * LogC.cut + LogC.f)
-        return (pow(10.0, (x - LogC.d) / LogC.c) - LogC.b) / LogC.a;
-    else
-        return (x - LogC.f) / LogC.e;
+    return half4(LinearToSRGB(c.rgb), c.a);
 }
 
-half3 LogCToLinear(half3 col)
-{
-    return (pow(10.0, (col - LogC.d) / LogC.c) - LogC.b) / LogC.a;
-}
-
-half3 LogCToLinear_Precise(half3 col)
-{
-    return half3(
-        LogCToLinear_Precise(col.x),
-        LogCToLinear_Precise(col.y),
-        LogCToLinear_Precise(col.z)
-    );
-}
-
-half3 ApplyLut2D(sampler2D tex, half3 uvw, half3 scaleOffset)
-{
-    uvw.z *= scaleOffset.z;
-    half shift = floor(uvw.z);
-    uvw.xy = uvw.xy * scaleOffset.z * scaleOffset.xy + scaleOffset.xy * 0.5;
-    uvw.x += shift * scaleOffset.y;
-    uvw.xyz = lerp(tex2D(tex, uvw.xy).rgb, tex2D(tex, uvw.xy + half2(scaleOffset.y, 0)).rgb, uvw.z - shift);
-    return uvw;
-}
-
-#endif //COLORGRADIING_INCLUDED
+#endif //COLOR_INCLUDED

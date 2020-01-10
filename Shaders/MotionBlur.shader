@@ -18,6 +18,8 @@
 			#define BLUR_STEPS 7.0
 			#define DEPTH_TEXTURE
 
+            sampler2D _MainTex;
+
 			#include "UnityCG.cginc"
 			#include "CGIncludes/MotionBlur.cginc"
 
