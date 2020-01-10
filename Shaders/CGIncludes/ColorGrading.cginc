@@ -6,6 +6,8 @@
 sampler2D _LUT;
 float4 _LUT_TexelSize ;
 
+float _Brightness;
+
 struct ParamsLogC
 {
 	half cut;
@@ -100,7 +102,7 @@ half3 ApplyLut2D(sampler2D tex, half3 uvw, half3 scaleOffset)
 half3 ApplyLut(half3 color)
 {
     half3 scaleOffset = half3(_LUT_TexelSize.xy, _LUT_TexelSize.w - 1);
-    return SRGBToLinear(ApplyLut2D(_LUT, LinearToSRGB(saturate(color)), scaleOffset));
+    return SRGBToLinear(ApplyLut2D(_LUT, LinearToSRGB(saturate(color * _Brightness)), scaleOffset));
 }
 
 half4 ApplyLut(half4 color)

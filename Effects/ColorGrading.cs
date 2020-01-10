@@ -21,16 +21,36 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
+        protected float m_brightness = 1.0f;
+        public float brightness
+        {
+            get => m_brightness;
+            set
+            {
+                if(value != m_brightness)
+                {
+                    m_brightness = Mathf.Clamp(value, 0f, 2f);
+                    destMat.SetFloat("_Brightness", m_brightness);
+                }
+            }
+        }
+
         protected override void OnEnable()
         {
-            base.OnEnable();
+            if(LUT == null)
+            {
+                enabled = false;
+                return;
+            }
             destMat.EnableKeyword("COLORGRADING_ENABLED");
+            base.OnEnable();
         }
 
         protected override void OnDisable()
         {
-            base.OnDisable();
             destMat.DisableKeyword("COLORGRADING_ENABLED");
+            base.OnDisable();
         }
 
         public override void Init(Material dest)
@@ -44,6 +64,7 @@ namespace Omega.Rendering.PostProcessing
         protected override void OnInspectorGUI()
         {
             LUT = EditorGUILayout.ObjectField("LUT", LUT, typeof(Texture2D), false) as Texture2D;
+            brightness = EditorGUILayout.Slider("Brightness", brightness, 0f, 2f);
         }
 #endif //UNITY_EDITOR
     }
