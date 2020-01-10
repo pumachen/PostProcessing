@@ -124,7 +124,7 @@ namespace Omega.Rendering.PostProcessing
             {
                 case Mode.PositionReconstruction: {
                         space = (MotionSpace)EditorGUILayout.EnumPopup("Space", space);
-                        camera = EditorGUILayout.ObjectField(camera, typeof(Camera), true) as Camera;
+                        camera = EditorGUILayout.ObjectField("Camera", camera, typeof(Camera), true) as Camera;
                         if (space == MotionSpace.Local)
                         {
                             targetTransform = EditorGUILayout.ObjectField(targetTransform, typeof(Transform), true) as Transform;

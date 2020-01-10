@@ -14,6 +14,8 @@
             #pragma vertex vert_img
             #pragma fragment frag_DownSample
 
+            sampler2D _MainTex;
+
             #include "UnityCG.cginc"
 			#include "CGIncludes/Bloom.cginc"
 

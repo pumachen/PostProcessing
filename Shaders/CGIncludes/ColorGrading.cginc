@@ -1,5 +1,5 @@
-#ifndef COLORGRADIING_INCLUDED
-#define COLORGRADIING_INCLUDED
+#ifndef COLOR_GRADIING_INCLUDED
+#define COLOR_GRADIING_INCLUDED
 
 #include "Color.cginc"
 
@@ -111,4 +111,4 @@ half4 ApplyLut(half4 color)
     return color;
 }
 
-#endif //COLORGRADIING_INCLUDED
+#endif //COLOR_GRADIING_INCLUDED

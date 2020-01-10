@@ -3,7 +3,6 @@
 
 #define Max3(a,b,c) max(max((a),(b)),(c))
 
-sampler2D _MainTex;
 sampler2D _BloomTex;
 
 /*

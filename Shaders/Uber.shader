@@ -17,12 +17,15 @@
             #pragma vertex vert_img
             #pragma fragment frag
 
-            #include "UnityCG.cginc"
-			#include "CGIncludes/Bloom.cginc"
-            //#include "CGIncludes/MotionBlur.cginc"
-            #include "CGIncludes/ColorGrading.cginc"
+            sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
 
-            //sampler2D _MainTex;
+
+            #include "UnityCG.cginc"
+            //#include "CGIncludes/MotionBlur.cginc"
+			#include "CGIncludes/Bloom.cginc"
+            #include "CGIncludes/ChromaticAberration.cginc"
+            #include "CGIncludes/ColorGrading.cginc"
 
             fixed4 frag (v2f_img i) : SV_Target
             {

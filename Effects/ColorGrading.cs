@@ -44,6 +44,7 @@ namespace Omega.Rendering.PostProcessing
                 return;
             }
             destMat.EnableKeyword("COLORGRADING_ENABLED");
+            destMat.SetFloat("_Brightness", m_brightness);
             base.OnEnable();
         }
 

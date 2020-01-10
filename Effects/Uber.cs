@@ -16,14 +16,20 @@ namespace Omega.Rendering.PostProcessing
         public FastBloom bloom => m_bloom;
 
         [SerializeField]
+        protected ChromaticAberration m_chromaticAberration = new ChromaticAberration();
+        public ChromaticAberration chromaticAberration => m_chromaticAberration;
+
+        [SerializeField]
         protected ColorGrading m_colorGrading = new ColorGrading();
         public ColorGrading colorGrading => m_colorGrading;
+
         protected override IEnumerable<PostProcessEffect> effects
         {
             get
             {
                 yield return motionBlur;
                 yield return bloom;
+                yield return chromaticAberration;
                 yield return colorGrading;
             }
         }
