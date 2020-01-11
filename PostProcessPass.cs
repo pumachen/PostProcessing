@@ -74,7 +74,6 @@ namespace Omega.Rendering.PostProcessing
 
         public abstract string name { get; }
         private bool unfold = true;
-        public bool debugMode = false;
 
         public void InspectorGUI()
         {

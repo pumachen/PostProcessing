@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif //UNITY_EDITOR
 
 namespace Omega.Rendering.PostProcessing
 {
@@ -23,6 +26,10 @@ namespace Omega.Rendering.PostProcessing
         protected ColorGrading m_colorGrading = new ColorGrading();
         public ColorGrading colorGrading => m_colorGrading;
 
+        [SerializeField]
+        protected Vignette m_vignette = new Vignette();
+        public Vignette vignette => m_vignette;
+
         protected override IEnumerable<PostProcessEffect> effects
         {
             get
@@ -31,6 +38,7 @@ namespace Omega.Rendering.PostProcessing
                 yield return bloom;
                 yield return chromaticAberration;
                 yield return colorGrading;
+                yield return vignette;
             }
         }
 
@@ -44,7 +52,10 @@ namespace Omega.Rendering.PostProcessing
 
         protected override void OnInspectorGUI()
         {
-            
+            if(PostProcessEffect.debugMode)
+            {
+                EditorGUILayout.ObjectField(material, typeof(Material), true);
+            }
         }
 
 #endif //UNITY_EDITOR

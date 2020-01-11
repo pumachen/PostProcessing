@@ -36,14 +36,14 @@ namespace Omega.Rendering.PostProcessing
             Graphics.Blit(src, bloomTex, material);
         }
 
-        public override void Init(Material dest)
+        public override void Init(Material destMat)
         {
-            base.Init(dest);
+            base.Init(destMat);
 
-            dest.SetTexture("_BloomTex", bloomTex);
-            bloomTex.onValueChange += () => dest.SetTexture("_BloomTex", bloomTex);
+            destMat.SetTexture("_BloomTex", bloomTex);
+            bloomTex.onValueChange += () => destMat.SetTexture("_BloomTex", bloomTex);
 
-            bloomParams.bloomParamsChanged += (param) => dest.SetVector("_BloomParams", param);
+            bloomParams.bloomParamsChanged += (param) => destMat.SetVector("_BloomParams", param);
             bloomParams.filterParamsChanged += (param) => material.SetVector("_FilterParams", param);
         }
 

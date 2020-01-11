@@ -48,7 +48,8 @@ namespace Omega.Rendering.PostProcessing
             {
                 if(m_spectralLut != value)
                 {
-                    m_spectralLut = value; 
+                    m_spectralLut = value;
+                    destMat.SetTexture("_ChromaticAberration_SpectralLut", m_spectralLut);
                 }
             }
         }
@@ -62,8 +63,33 @@ namespace Omega.Rendering.PostProcessing
                 if(m_intensity != value)
                 {
                     m_intensity = Mathf.Clamp01(value);
+                    destMat.SetFloat("_ChromaticAberration_Amount", m_intensity * 0.05f);
                 }
             }
+        }
+
+        protected override void OnEnable()
+        {
+            if(spectralLut == null)
+            {
+                enabled = false;
+                return;
+            }
+            base.OnEnable();
+            destMat.EnableKeyword("CHROMATIC_ABERRATION_ENABLED");
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            destMat.DisableKeyword("CHROMATIC_ABERRATION_ENABLED");
+        }
+
+        public override void Init(Material destMat)
+        {
+            base.Init(destMat);
+            destMat.SetTexture("_ChromaticAberration_SpectralLut", spectralLut);
+            destMat.SetFloat("_ChromaticAberration_Amount", intensity * 0.05f);
         }
 #if UNITY_EDITOR
         public override string name { get => "Chromatic Aberration"; }

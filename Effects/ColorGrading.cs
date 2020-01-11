@@ -44,7 +44,6 @@ namespace Omega.Rendering.PostProcessing
                 return;
             }
             destMat.EnableKeyword("COLORGRADING_ENABLED");
-            destMat.SetFloat("_Brightness", m_brightness);
             base.OnEnable();
         }
 
@@ -54,9 +53,10 @@ namespace Omega.Rendering.PostProcessing
             base.OnDisable();
         }
 
-        public override void Init(Material dest)
+        public override void Init(Material destMat)
         {
-            base.Init(dest);
+            base.Init(destMat);
+            destMat.SetFloat("_Brightness", m_brightness);
         }
 
 #if UNITY_EDITOR
