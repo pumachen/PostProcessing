@@ -40,8 +40,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        private Material m_destmat;
-        protected Material destMat => m_destmat;
+        protected Material destMat { get; private set; }
 
         protected virtual Shader shader => null;
 
@@ -50,7 +49,7 @@ namespace Omega.Rendering.PostProcessing
 
         public virtual void Init(Material destMat)
         {
-            m_destmat = destMat;
+            this.destMat = destMat;
             if (m_enabled)
                 OnEnable();
             else

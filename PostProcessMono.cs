@@ -41,9 +41,21 @@ namespace Omega.Rendering.PostProcessing
             uber.Init();
         }
 
+        protected void OnEnable()
+        {
+            uber.Init();
+        }
+
         public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
-            uber.Process(src, dest);
+            if (uber.enabled)
+            {
+                uber.Process(src, dest);
+            }
+            else
+            {
+                Graphics.Blit(src, dest);
+            }
         }
 
 #if UNITY_EDITOR

@@ -79,7 +79,7 @@ namespace Omega.Rendering.PostProcessing
         {
             using (new GUILayout.HorizontalScope())
             {
-                EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
+                enabled = EditorGUILayout.ToggleLeft(" ", enabled, GUILayout.Width(20f));
                 EditorGUILayout.LabelField(" ", GUILayout.Width(5f));
                 unfold = EditorGUILayout.Foldout(unfold, name);
             }

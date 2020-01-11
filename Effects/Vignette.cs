@@ -49,7 +49,6 @@ namespace Omega.Rendering.PostProcessing
                 if(m_mask != value && m_proceduralMask != value)
                 {
                     m_mask = value;
-
                 }
             }
         }
@@ -197,7 +196,7 @@ namespace Omega.Rendering.PostProcessing
                 roundness,
                 rounded ? 1f : 0f);
             material.SetVector("_Vignette_Params", param);
-            Graphics.Blit(null, proceduralMask, material);
+            Graphics.Blit(null, m_proceduralMask, material);
             destMat.SetTexture("_Vignette_Mask", mask);
         }
 
@@ -205,7 +204,7 @@ namespace Omega.Rendering.PostProcessing
         public override string name => "Vignette";
         protected override void OnInspectorGUI()
         {
-            mask = EditorGUILayout.ObjectField("Vignette Mask", mask, typeof(Texture), true) as Texture;
+            mask = EditorGUILayout.ObjectField("Vignette Mask", mask, typeof(Texture), false) as Texture;
             color = EditorGUILayout.ColorField("Color", color);
             if(mask == proceduralMask)
             {
