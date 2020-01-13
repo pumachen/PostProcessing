@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -16,7 +16,7 @@ namespace Omega.Rendering.PostProcessing
             get { return m_enabled; }
             set
             {
-                if (value != m_enabled)
+                if (m_enabled != value)
                 {
                     m_enabled = value;
                     if (value == true)

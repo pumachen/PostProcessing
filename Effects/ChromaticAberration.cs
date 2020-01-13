@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -18,7 +19,8 @@ namespace Omega.Rendering.PostProcessing
                     m_defaultSpectralLut = new Texture2D(3, 1, TextureFormat.RGB24, false)
                     {
                         filterMode = FilterMode.Bilinear,
-                        wrapMode = TextureWrapMode.Clamp
+                        wrapMode = TextureWrapMode.Clamp,
+                        name = "Default SpectralLut"
                     };
                     m_defaultSpectralLut.SetPixel(0, 0, Color.red);
                     m_defaultSpectralLut.SetPixel(1, 0, Color.green);
@@ -46,7 +48,7 @@ namespace Omega.Rendering.PostProcessing
             }
             set
             {
-                if(m_spectralLut != value)
+                if(m_spectralLut != value && defaultSpectralLut != value)
                 {
                     m_spectralLut = value;
                     destMat.SetTexture("_ChromaticAberration_SpectralLut", m_spectralLut);
@@ -54,6 +56,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
         protected float m_intensity = 0f;
         public float intensity
         {

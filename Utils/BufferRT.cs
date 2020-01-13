@@ -130,6 +130,25 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
+        protected string m_name = "";
+
+        public string name
+        {
+            get => m_name;
+            set
+            {
+                if(m_name != value)
+                {
+                    m_name = value;
+                    if (m_RT != null)
+                    {
+                        m_RT.name = m_name;
+                    }
+                }
+            }
+        }
+
         private RenderTexture m_RT;
         public RenderTexture RT
         {
@@ -153,7 +172,7 @@ namespace Omega.Rendering.PostProcessing
             {
                 useMipMap = useMipMap,
             };
-            m_RT = new RenderTexture(descriptor);
+            m_RT = new RenderTexture(descriptor) { name = name };
             m_RT.useMipMap = m_useMipMap;
             onValueChange?.Invoke();
 
@@ -194,15 +213,23 @@ namespace Omega.Rendering.PostProcessing
 #if UNITY_EDITOR
         public void OnGUI()
         {
-            resolutionMode = (ResolutionMode)EditorGUILayout.EnumPopup("Resolution Mode", resolutionMode);
-            if(resolutionMode == ResolutionMode.Absolute)
+            EditorGUILayout.LabelField(name);
+            using (new GUILayout.HorizontalScope())
             {
-                resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
-            }
-            else
-            {
-                camera = EditorGUILayout.ObjectField("Camera", camera, typeof(Camera), true) as Camera;
-                scale = EditorGUILayout.Slider("Scale", scale, 0, 1);
+                EditorGUILayout.Space(5f);
+                using (new GUILayout.VerticalScope())
+                {
+                    resolutionMode = (ResolutionMode)EditorGUILayout.EnumPopup("Resolution Mode", resolutionMode);
+                    if (resolutionMode == ResolutionMode.Absolute)
+                    {
+                        resolution = EditorGUILayout.Vector2IntField("Resolution", resolution);
+                    }
+                    else
+                    {
+                        camera = EditorGUILayout.ObjectField("Camera", camera, typeof(Camera), true) as Camera;
+                        scale = EditorGUILayout.Slider("Scale", scale, 0, 1);
+                    }
+                }
             }
         }
 

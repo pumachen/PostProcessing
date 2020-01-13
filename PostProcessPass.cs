@@ -12,7 +12,7 @@ namespace Omega.Rendering.PostProcessing
     public abstract class PostProcessPass
     {
         [SerializeField]
-        private bool m_enabled = false;
+        private bool m_enabled = true;
         public bool enabled
         {
             get { return m_enabled; }

@@ -298,46 +298,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!28 &216614543
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  serializedVersion: 2
-  m_Width: 3
-  m_Height: 1
-  m_CompleteImageSize: 9
-  m_TextureFormat: 3
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_LightmapFormat: 0
-  m_ColorSpace: 0
-  image data: 9
-  _typelessdata: ff000000ff000000ff
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &261374640
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,23 +680,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_uber:
-    m_enabled: 0
-    m_motionBlur:
-      m_enabled: 0
-      m_mode: 0
-      m_space: 1
-      m_blurFactor: 0
-      camera: {fileID: 0}
-      targetTransform: {fileID: 0}
+    m_enabled: 1
     m_bloom:
-      m_enabled: 0
-      bloomTex:
+      m_enabled: 1
+      m_bloomTex:
         m_resolutionMode: 0
         m_camera: {fileID: 0}
         m_scale: 0.5
         m_resolution: {x: 512, y: 256}
         m_format: 0
         m_useMipMap: 1
+        m_name: Bloom Tex
       bloomParams:
         m_filterExp: 1
         m_minMipLevel: 1
@@ -744,10 +698,11 @@ MonoBehaviour:
         m_intensity: 0.5
     m_chromaticAberration:
       m_enabled: 1
-      m_spectralLut: {fileID: 216614543}
+      m_spectralLut: {fileID: 0}
+      m_intensity: 0.5
     m_colorGrading:
-      m_enabled: 0
-      m_LUT: {fileID: 0}
+      m_enabled: 1
+      m_LUT: {fileID: 2800000, guid: 1f76d7cba2a32f9418a1783e1fb9e100, type: 3}
       m_brightness: 1
     m_vignette:
       m_enabled: 1

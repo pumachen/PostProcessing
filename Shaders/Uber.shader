@@ -14,10 +14,10 @@
         Pass
         {
             CGPROGRAM
-            #pragma multi_compile BLOOM_ENABLED _
-            #pragma multi_compile COLORGRADING_ENABLED _
-            #pragma multi_compile CHROMATIC_ABERRATION_ENABLED _
-            #pragma multi_compile VIGNETTE_ENABLED _
+            #pragma multi_compile BLOOM_ENABLED __
+            #pragma multi_compile COLORGRADING_ENABLED __
+            #pragma multi_compile CHROMATIC_ABERRATION_ENABLED __
+            #pragma multi_compile VIGNETTE_ENABLED __
             #pragma vertex vert_img
             #pragma fragment frag
 

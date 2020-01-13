@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Fuxi.RP;
 
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditorInternal;
 #endif //UNITY_EDITOR
 
 namespace Omega.Rendering.PostProcessing
@@ -36,12 +33,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected void Awake()
-        {
-            uber.Init();
-        }
-
-        protected void OnEnable()
+        protected void Start()
         {
             uber.Init();
         }
@@ -72,10 +64,12 @@ namespace Omega.Rendering.PostProcessing
             public override void OnInspectorGUI()
             {
                 PostProcessEffect.debugMode = EditorGUILayout.ToggleLeft("Debug", PostProcessEffect.debugMode);
+                Undo.RecordObject(target, "Post Process Settings Modification");
                 foreach (var pass in target.passes)
                 {
                     pass.InspectorGUI();
                 }
+                serializedObject.ApplyModifiedProperties();
             }
         }
 #endif //UNITY_EDITORd

@@ -31,7 +31,8 @@ fixed4 DownSample(sampler2D mainTex, float2 uv)
 {
 	fixed4 col = tex2D(mainTex, uv);
 	float brightness = Max3(col.r, col.g, col.b);
-	return saturate(pow(brightness, FILTER_EXP)) * col;
+	col.rgb *= saturate(pow(brightness, FILTER_EXP));
+	return col;
 }
 
 fixed4 frag_DownSample(v2f_img i) : SV_Target

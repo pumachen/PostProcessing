@@ -16,8 +16,11 @@ namespace Omega.Rendering.PostProcessing
             get => m_LUT;
             set
             {
-                m_LUT = value;
-                destMat.SetTexture("_LUT", value);
+                if(m_LUT != value)
+                {
+                    m_LUT = value;
+                    destMat.SetTexture("_LUT", value);
+                }
             }
         }
 
@@ -56,6 +59,7 @@ namespace Omega.Rendering.PostProcessing
         public override void Init(Material destMat)
         {
             base.Init(destMat);
+            destMat.SetTexture("_LUT", LUT);
             destMat.SetFloat("_Brightness", m_brightness);
         }
 

@@ -14,8 +14,19 @@ namespace Omega.Rendering.PostProcessing
             get => Shader.Find("Hidden/PostProcess/FastBloom");
         }
 
-        public BufferRT bloomTex = 
-            new BufferRT(0.5f, RenderTextureFormat.ARGB32, true);
+        [SerializeField]
+        protected BufferRT m_bloomTex = new BufferRT(0.5f, RenderTextureFormat.ARGB32, true) { name = "Bloom Tex" };
+        public BufferRT bloomTex
+        {
+            get
+            {
+                if(m_bloomTex == null)
+                {
+                    m_bloomTex = new BufferRT(0.5f, RenderTextureFormat.ARGB32, true) { name = "Bloom Tex" };
+                }
+                return m_bloomTex;
+            }
+        }
 
         public BloomParams bloomParams = new BloomParams();
 
@@ -108,7 +119,6 @@ namespace Omega.Rendering.PostProcessing
             remove => m_bloomParamsChanged -= value;
         }
 
-        #region FilterParams
         protected event UnityAction<Vector4> m_filterParamsChanged;
         public event UnityAction<Vector4> filterParamsChanged
         {
@@ -123,6 +133,7 @@ namespace Omega.Rendering.PostProcessing
             remove => m_filterParamsChanged -= value;
         }
 
+        #region FilterParams
         [SerializeField]
         private float m_filterExp = 1.0f;
         public float filterExp

@@ -11,10 +11,6 @@ namespace Omega.Rendering.PostProcessing
     public class Uber : PostProcessPass
     {
         [SerializeField]
-        protected MotionBlur m_motionBlur = new MotionBlur();
-        public MotionBlur motionBlur => m_motionBlur;
-
-        [SerializeField]
         protected FastBloom m_bloom = new FastBloom();
         public FastBloom bloom => m_bloom;
 
@@ -34,7 +30,6 @@ namespace Omega.Rendering.PostProcessing
         {
             get
             {
-                yield return motionBlur;
                 yield return bloom;
                 yield return chromaticAberration;
                 yield return colorGrading;

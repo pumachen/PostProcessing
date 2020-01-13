@@ -22,11 +22,6 @@ namespace Omega.Rendering.PostProcessing
             {
                 if (m_proceduralMask == null)
                 {
-                    m_proceduralMask = new RenderTexture(
-                        Screen.width / 2,
-                        Screen.height / 2,
-                        0,
-                        RenderTextureFormat.R8);
                     UpdateProceduralMask();
                 }
                 return m_proceduralMask;
@@ -49,6 +44,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_mask != value && m_proceduralMask != value)
                 {
                     m_mask = value;
+                    destMat.SetTexture("_Vignette_Mask", mask);
                 }
             }
         }
@@ -178,23 +174,28 @@ namespace Omega.Rendering.PostProcessing
             destMat.DisableKeyword("VIGNETTE_ENABLED");
         }
 
-        protected void SetVignetteParams()
+        public override void Process(RenderTexture src)
         {
-            Vector4 param = new Vector4(
-                intensity * 3f,
-                smoothness * 5f,
-                roundness,
-                rounded ? 1f : 0f);
-            material.SetVector("_Vignette_Params", param);
+            base.Process(src);
         }
+
         protected void UpdateProceduralMask()
         {
+            if (m_proceduralMask == null)
+            {
+                m_proceduralMask = new RenderTexture(
+                    Screen.width / 2,
+                    Screen.height / 2,
+                    0,
+                    RenderTextureFormat.R8)
+                { name = "Procedural Mask" };
+            }
             material.SetVector("_Vignette_Center", center);
             Vector4 param = new Vector4(
                 intensity * 3f,
                 smoothness * 5f,
                 roundness,
-                rounded ? 1f : 0f);
+                rounded ? ((float)Screen.height / Screen.width) : 1f);
             material.SetVector("_Vignette_Params", param);
             Graphics.Blit(null, m_proceduralMask, material);
             destMat.SetTexture("_Vignette_Mask", mask);
@@ -206,6 +207,7 @@ namespace Omega.Rendering.PostProcessing
         {
             mask = EditorGUILayout.ObjectField("Vignette Mask", mask, typeof(Texture), false) as Texture;
             color = EditorGUILayout.ColorField("Color", color);
+            opacity = EditorGUILayout.Slider("Opacity", opacity, 0f, 1f);
             if(mask == proceduralMask)
             {
                 EditorGUILayout.LabelField("Procedural Mask");
