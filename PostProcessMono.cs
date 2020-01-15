@@ -38,6 +38,11 @@ namespace Omega.Rendering.PostProcessing
             uber.Init();
         }
 
+        protected void OnEnable()
+        {
+            enabled = uber.enabled;
+        }
+
         public virtual void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
             if (uber.enabled)

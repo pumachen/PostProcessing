@@ -45,12 +45,13 @@
             #endif
 
             #if COLORGRADING_ENABLED
-                col = ApplyLut(col);
+                col = ApplyLut(saturate(col));
             #endif
 
             #if VIGNETTE_ENABLED
                 col = ApplyVignette(col, i.uv);
             #endif
+
                 return col;
             }
             ENDCG

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -44,7 +45,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_mask != value && m_proceduralMask != value)
                 {
                     m_mask = value;
-                    destMat.SetTexture("_Vignette_Mask", mask);
+                    destMat.SetTexture(Props.vignetteMask, mask);
                 }
             }
         }
@@ -59,7 +60,7 @@ namespace Omega.Rendering.PostProcessing
                 if(color != value)
                 {
                     m_color = value;
-                    destMat.SetColor("_Vignette_Color", m_color);
+                    destMat.SetColor(Props.vignetteColor, m_color);
                 }
             }
         }
@@ -74,7 +75,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_opacity != value)
                 {
                     m_opacity = Mathf.Clamp01(value);
-                    destMat.SetFloat("_Vignette_Opacity", m_opacity);
+                    destMat.SetFloat(Props.vignetteOpacity, m_opacity);
                 }
             }
         }
@@ -154,12 +155,11 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        public override void Init(Material destMat)
+        protected override void SetProperties()
         {
-            base.Init(destMat);
-            destMat.SetTexture("_Vignette_Mask", mask);
-            destMat.SetColor("_Vignette_Color", color);
-            destMat.SetFloat("_Vignette_Opacity", opacity);
+            destMat.SetTexture(Props.vignetteMask, mask);
+            destMat.SetColor(Props.vignetteColor, color);
+            destMat.SetFloat(Props.vignetteOpacity, opacity);
         }
 
         protected override void OnEnable()
@@ -174,11 +174,6 @@ namespace Omega.Rendering.PostProcessing
             destMat.DisableKeyword("VIGNETTE_ENABLED");
         }
 
-        public override void Process(RenderTexture src)
-        {
-            base.Process(src);
-        }
-
         protected void UpdateProceduralMask()
         {
             if (m_proceduralMask == null)
@@ -190,15 +185,15 @@ namespace Omega.Rendering.PostProcessing
                     RenderTextureFormat.R8)
                 { name = "Procedural Mask" };
             }
-            material.SetVector("_Vignette_Center", center);
+            material.SetVector(Props.vignetteCenter, center);
             Vector4 param = new Vector4(
                 intensity * 3f,
                 smoothness * 5f,
                 roundness,
                 rounded ? ((float)Screen.height / Screen.width) : 1f);
-            material.SetVector("_Vignette_Params", param);
+            material.SetVector(Props.vignetteParams, param);
             Graphics.Blit(null, m_proceduralMask, material);
-            destMat.SetTexture("_Vignette_Mask", mask);
+            destMat.SetTexture(Props.vignetteMask, mask);
         }
 
 #if UNITY_EDITOR

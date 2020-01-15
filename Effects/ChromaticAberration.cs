@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -51,7 +52,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_spectralLut != value && defaultSpectralLut != value)
                 {
                     m_spectralLut = value;
-                    destMat.SetTexture("_ChromaticAberration_SpectralLut", m_spectralLut);
+                    destMat.SetTexture(Props.spectralLut, m_spectralLut);
                 }
             }
         }
@@ -66,7 +67,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_intensity != value)
                 {
                     m_intensity = Mathf.Clamp01(value);
-                    destMat.SetFloat("_ChromaticAberration_Amount", m_intensity * 0.05f);
+                    destMat.SetFloat(Props.chromaticAmount, m_intensity * 0.05f);
                 }
             }
         }
@@ -88,11 +89,10 @@ namespace Omega.Rendering.PostProcessing
             destMat.DisableKeyword("CHROMATIC_ABERRATION_ENABLED");
         }
 
-        public override void Init(Material destMat)
+        protected override void SetProperties()
         {
-            base.Init(destMat);
-            destMat.SetTexture("_ChromaticAberration_SpectralLut", spectralLut);
-            destMat.SetFloat("_ChromaticAberration_Amount", intensity * 0.05f);
+            destMat.SetTexture(Props.spectralLut, spectralLut);
+            destMat.SetFloat(Props.chromaticAmount, intensity * 0.05f);
         }
 #if UNITY_EDITOR
         public override string name { get => "Chromatic Aberration"; }

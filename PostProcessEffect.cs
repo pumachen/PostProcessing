@@ -44,19 +44,32 @@ namespace Omega.Rendering.PostProcessing
 
         protected virtual Shader shader => null;
 
-        protected virtual void OnEnable()  {}
+        protected virtual void OnEnable()
+        {
+            SetProperties();
+        }
         protected virtual void OnDisable() {}
 
-        public virtual void Init(Material destMat)
+        public void Init(Material destMat)
         {
             this.destMat = destMat;
+            Init();
             if (m_enabled)
                 OnEnable();
             else
                 OnDisable();
         }
 
-        public virtual void Process(RenderTexture src) {}
+        protected virtual void Init() {}
+
+        protected abstract void SetProperties();
+
+        public virtual void Process(RenderTexture src)
+        {
+#if UNITY_EDITOR
+            SetProperties();
+#endif
+        }
 
 #if UNITY_EDITOR
 

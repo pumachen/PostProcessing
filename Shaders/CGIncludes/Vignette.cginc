@@ -10,17 +10,17 @@ float _Vignette_Opacity;
 
 float2 _Vignette_Center;
 float4 _Vignette_Params;
-// x: intensity * 3
-// y: smoothness * 5
-// z: Roundness
-// w: aspect ratio
+#define _Vignette_Intensity  (_Vignette_Params.x)
+#define _Vignette_Smoothness (_Vignette_Params.y)
+#define _Vignette_Roundness  (_Vignette_Params.z)
+#define _Vignette_Aspect     (_Vignette_Params.w)
 
 fixed4 frag_VignetteMaskBaker(v2f_img i) : SV_Target
 {
-    half2 d = abs(i.uv - _Vignette_Center) * _Vignette_Params.x;
-    d.x *= _Vignette_Params.w;
-    d = pow(saturate(d), _Vignette_Params.z); // Roundness
-    return pow(saturate(1.0 - dot(d, d)), _Vignette_Params.y);
+    half2 d = abs(i.uv - _Vignette_Center) * _Vignette_Intensity;
+    d.x *= _Vignette_Aspect;
+    d = pow(saturate(d), _Vignette_Roundness); // Roundness
+    return pow(saturate(1.0 - dot(d, d)), _Vignette_Smoothness);
 }
 
 fixed4 ApplyVignette(fixed4 color, float2 uv)

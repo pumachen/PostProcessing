@@ -43,17 +43,30 @@ namespace Omega.Rendering.PostProcessing
         }
 
         protected abstract IEnumerable<PostProcessEffect> effects { get; }
-        protected List<PostProcessEffect> effectList;
+        private List<PostProcessEffect> m_effectList;
+        protected List<PostProcessEffect> effectList
+        {
+            get
+            {
+                if(m_effectList == null)
+                {
+                    m_effectList = new List<PostProcessEffect>(10);
+                    foreach (var effect in effects)
+                    {
+                        m_effectList.Add(effect);
+                    }
+                }
+                return m_effectList;
+            }
+        }
 
         protected virtual void OnEnable()  {}
         protected virtual void OnDisable() {}
 
         public virtual void Init()
         {
-            effectList = new List<PostProcessEffect>(10);
-            foreach(var effect in effects)
+            foreach (PostProcessEffect effect in effectList)
             {
-                effectList.Add(effect);
                 effect.Init(material);
             }
         }

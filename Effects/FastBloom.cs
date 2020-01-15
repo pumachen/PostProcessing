@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -28,6 +29,8 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
+        protected BloomParams m_bloomParams;
         public BloomParams bloomParams = new BloomParams();
 
         protected override void OnEnable()
@@ -41,22 +44,29 @@ namespace Omega.Rendering.PostProcessing
             base.OnDisable();
             destMat.DisableKeyword("BLOOM_ENABLED");
         }
+        protected override void Init()
+        {
+            bloomTex.onValueChange += () => destMat.SetTexture(Props.bloomTex, bloomTex);
+
+            bloomParams.bloomParamsChanged += (param) => destMat.SetVector(Props.bloomParams, param);
+            bloomParams.filterParamsChanged += (param) => material.SetVector(Props.filterParams, param);
+        }
+
+        protected override void SetProperties()
+        {
+            destMat.SetTexture(Props.bloomTex, bloomTex);
+            destMat.SetVector(Props.bloomParams, bloomParams.bloomParams);
+
+            material.SetVector(Props.filterParams, bloomParams.filterParams);
+        }
 
         public override void Process(RenderTexture src)
         {
+            base.Process(src);
             Graphics.Blit(src, bloomTex, material);
         }
 
-        public override void Init(Material destMat)
-        {
-            base.Init(destMat);
-
-            destMat.SetTexture("_BloomTex", bloomTex);
-            bloomTex.onValueChange += () => destMat.SetTexture("_BloomTex", bloomTex);
-
-            bloomParams.bloomParamsChanged += (param) => destMat.SetVector("_BloomParams", param);
-            bloomParams.filterParamsChanged += (param) => material.SetVector("_FilterParams", param);
-        }
+        
 
 #if UNITY_EDITOR
         public override string name { get => "Bloom"; }
@@ -78,7 +88,7 @@ namespace Omega.Rendering.PostProcessing
             EditorGUILayout.LabelField("BloomParams");
             using (new GUILayout.HorizontalScope())
             {
-                EditorGUILayout.Space(5f);
+                EditorGUILayout.Space();
                 using (new GUILayout.VerticalScope())
                 {
                     bloomParams.filterExp = EditorGUILayout.Slider("Filter Exp", bloomParams.filterExp, 1f, 10f);
@@ -93,7 +103,8 @@ namespace Omega.Rendering.PostProcessing
                             "Max Mipmap Level",
                             bloomParams.maxMipLevel,
                             0,
-                            bloomTex.RT.mipmapCount);
+                            8);
+                    //bloomTex.RT.mipmapCount);
                     bloomParams.intensity = EditorGUILayout.
                         Slider("Intensity", bloomParams.intensity, 0, 1);
                 }

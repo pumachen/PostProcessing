@@ -216,7 +216,7 @@ namespace Omega.Rendering.PostProcessing
             EditorGUILayout.LabelField(name);
             using (new GUILayout.HorizontalScope())
             {
-                EditorGUILayout.Space(5f);
+                EditorGUILayout.Space();
                 using (new GUILayout.VerticalScope())
                 {
                     resolutionMode = (ResolutionMode)EditorGUILayout.EnumPopup("Resolution Mode", resolutionMode);

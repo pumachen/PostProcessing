@@ -35,7 +35,7 @@ namespace Omega.Rendering.PostProcessing
                 if (value != m_blurFactor)
                 {
                     m_blurFactor = value;
-                    Shader.SetGlobalFloat("_MotionBlurFactor", value);
+                    destMat.SetFloat("_MotionBlurFactor", m_blurFactor);
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace Omega.Rendering.PostProcessing
             base.OnEnable();
         }
 
-        public override void Process(RenderTexture src)
+        protected override void SetProperties()
         {
             var matrix = this.matrix;
             destMat.SetMatrix("_CurrentToPrevProjPos", prevMatrix * matrix.inverse);

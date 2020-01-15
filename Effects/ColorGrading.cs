@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
+using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -19,7 +19,7 @@ namespace Omega.Rendering.PostProcessing
                 if(m_LUT != value)
                 {
                     m_LUT = value;
-                    destMat.SetTexture("_LUT", value);
+                    destMat.SetTexture(Props.LUT, value);
                 }
             }
         }
@@ -34,7 +34,7 @@ namespace Omega.Rendering.PostProcessing
                 if(value != m_brightness)
                 {
                     m_brightness = Mathf.Clamp(value, 0f, 2f);
-                    destMat.SetFloat("_Brightness", m_brightness);
+                    destMat.SetFloat(Props.brightness, m_brightness);
                 }
             }
         }
@@ -46,21 +46,20 @@ namespace Omega.Rendering.PostProcessing
                 enabled = false;
                 return;
             }
-            destMat.EnableKeyword("COLORGRADING_ENABLED");
             base.OnEnable();
+            destMat.EnableKeyword("COLORGRADING_ENABLED");
         }
 
         protected override void OnDisable()
         {
-            destMat.DisableKeyword("COLORGRADING_ENABLED");
             base.OnDisable();
+            destMat.DisableKeyword("COLORGRADING_ENABLED");
         }
 
-        public override void Init(Material destMat)
+        protected override void SetProperties()
         {
-            base.Init(destMat);
-            destMat.SetTexture("_LUT", LUT);
-            destMat.SetFloat("_Brightness", m_brightness);
+            destMat.SetTexture(Props.LUT, LUT);
+            destMat.SetFloat(Props.brightness, m_brightness);
         }
 
 #if UNITY_EDITOR

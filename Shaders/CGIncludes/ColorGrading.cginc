@@ -102,7 +102,14 @@ half3 ApplyLut2D(sampler2D tex, half3 uvw, half3 scaleOffset)
 half3 ApplyLut(half3 color)
 {
     half3 scaleOffset = half3(_LUT_TexelSize.xy, _LUT_TexelSize.w - 1);
-    return SRGBToLinear(ApplyLut2D(_LUT, LinearToSRGB(saturate(color * _Brightness)), scaleOffset));
+
+    color = saturate(color * _Brightness);
+
+    //color.rgb = LinearToSRGB(color.rgb);
+    color.rgb = ApplyLut2D(_LUT, color.rgb, scaleOffset);
+    //color.rgb = SRGBToLinear(color.rgb);
+
+    return color;
 }
 
 half4 ApplyLut(half4 color)
