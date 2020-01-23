@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -30,7 +29,7 @@ namespace Omega.Rendering.PostProcessing
         }
         protected abstract Shader shader { get; }
         protected Material m_material;
-        protected virtual Material material
+        public virtual Material material
         {
             get
             {
@@ -71,7 +70,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        public virtual void Process(RenderTexture src, RenderTexture dest)
+        public virtual void Process(RenderTexture src)
         {
             foreach (PostProcessEffect effect in effectList)
             {
@@ -80,6 +79,11 @@ namespace Omega.Rendering.PostProcessing
                     effect.Process(src);
                 }
             }
+        }
+
+        public virtual void Process(RenderTexture src, RenderTexture dest)
+        {
+            Process(src);
             Graphics.Blit(src, dest, material);
         }
 

@@ -63,7 +63,9 @@ namespace Omega.Rendering.PostProcessing
         public override void Process(RenderTexture src)
         {
             base.Process(src);
+            bloomTex.RT.autoGenerateMips = false;
             Graphics.Blit(src, bloomTex, material);
+            bloomTex.RT.GenerateMips();
         }
 
         
@@ -207,7 +209,7 @@ namespace Omega.Rendering.PostProcessing
         }
 
         [SerializeField]
-        private float m_intensity = 0.5f;
+        private float m_intensity = 0.3f;
         public float intensity
         {
             get => m_intensity;

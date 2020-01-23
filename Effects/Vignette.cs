@@ -155,6 +155,12 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        protected override void Init()
+        {
+            base.Init();
+            UpdateProceduralMask();
+        }
+
         protected override void SetProperties()
         {
             destMat.SetTexture(Props.vignetteMask, mask);
@@ -176,11 +182,12 @@ namespace Omega.Rendering.PostProcessing
 
         protected void UpdateProceduralMask()
         {
+            Resolution res = Screen.currentResolution;
             if (m_proceduralMask == null)
             {
                 m_proceduralMask = new RenderTexture(
-                    Screen.width / 2,
-                    Screen.height / 2,
+                    res.width / 2,
+                    res.height / 2,
                     0,
                     RenderTextureFormat.R8)
                 { name = "Procedural Mask" };
@@ -190,7 +197,7 @@ namespace Omega.Rendering.PostProcessing
                 intensity * 3f,
                 smoothness * 5f,
                 roundness,
-                rounded ? ((float)Screen.height / Screen.width) : 1f);
+                rounded ? ((float)res.height / res.width) : 1f);
             material.SetVector(Props.vignetteParams, param);
             Graphics.Blit(null, m_proceduralMask, material);
             destMat.SetTexture(Props.vignetteMask, mask);
