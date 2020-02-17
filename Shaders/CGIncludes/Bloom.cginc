@@ -1,7 +1,7 @@
 #ifndef BLOOM_INCLUDED
 #define BLOOM_INCLUDED
 
-#define Max3(a,b,c) max(max((a),(b)),(c))
+#include "CGIncludes/StdLib.cginc"
 
 sampler2D _BloomTex;
 
@@ -26,6 +26,25 @@ float4 _BloomParams;
 #define BLOOM_MIP_MAX   _BloomParams.y
 #define BLOOM_INV_STEPS _BloomParams.z
 #define BLOOM_INTENSITY _BloomParams.w
+
+//
+// Quadratic color thresholding
+// curve = (threshold - knee, knee * 2, 0.25 / knee)
+//
+half4 QuadraticThreshold(half4 color, half threshold, half3 curve)
+{
+	// Pixel brightness
+	half br = Max3(color.r, color.g, color.b);
+
+	// Under-threshold part: quadratic curve
+	half rq = clamp(br - curve.x, 0.0, curve.y);
+	rq = curve.z * rq * rq;
+
+	// Combine and apply the brightness response curve.
+	color *= max(rq, br - threshold) / max(br, EPSILON);
+
+	return color;
+}
 
 fixed4 DownSample(sampler2D mainTex, float2 uv)
 {

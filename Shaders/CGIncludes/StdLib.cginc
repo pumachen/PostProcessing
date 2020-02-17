@@ -17,6 +17,22 @@
 #define FLT_MIN         1.175494351e-38 // Minimum representable positive floating-point number
 #define FLT_MAX         3.402823466e+38 // Maximum representable floating-point number
 
+inline half Min3(half3 x) { return min(x.x, min(x.y, x.z)); }
+inline half Min3(half x, half y, half z) { return min(x, min(y, z)); }
+
+inline half Max3(half3 x) { return max(x.x, max(x.y, x.z)); }
+inline half Max3(half x, half y, half z) { return max(x, max(y, z)); }
+
+inline half  Pow2(half  x) { return x * x; }
+inline half2 Pow2(half2 x) { return x * x; }
+inline half3 Pow2(half3 x) { return x * x; }
+inline half4 Pow2(half4 x) { return x * x; }
+
+inline half  Pow3(half  x) { return x * x * x; }
+inline half2 Pow3(half2 x) { return x * x * x; }
+inline half3 Pow3(half3 x) { return x * x * x; }
+inline half4 Pow3(half4 x) { return x * x * x; }
+
 // Using pow often result to a warning like this
 // "pow(f, e) will not work for negative f, use abs(f) or conditionally handle negative values if you expect them"
 // PositivePow remove this warning when you know the value is positive and avoid inf/NAN.

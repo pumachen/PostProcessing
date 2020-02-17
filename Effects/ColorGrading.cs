@@ -10,19 +10,26 @@ namespace Omega.Rendering.PostProcessing
     public class ColorGrading : PostProcessEffect
     {
         [SerializeField]
-        protected Texture2D m_LUT;
-        public Texture2D LUT
+        protected Texture m_LUT;
+        public Texture LUT
         {
-            get => m_LUT;
+            get
+            {
+                return m_LUT ? m_LUT : proceduralLUT;
+            }
             set
             {
-                if(m_LUT != value)
+                if(m_LUT != value && value != proceduralLUT)
                 {
                     m_LUT = value;
-                    destMat.SetTexture(Props.LUT, value);
+                    destMat.SetTexture(Props.LUT, LUT);
                 }
             }
         }
+
+#if UNITY_EDITOR
+        public LUT proceduralLUT = new LUT(32);
+#endif
 
         [SerializeField]
         protected float m_brightness = 1.0f;
@@ -56,6 +63,12 @@ namespace Omega.Rendering.PostProcessing
             destMat.DisableKeyword("COLORGRADING_ENABLED");
         }
 
+        public override void Process(RenderTexture src)
+        {
+            proceduralLUT.Render();
+            base.Process(src);
+        }
+
         protected override void SetProperties()
         {
             destMat.SetTexture(Props.LUT, LUT);
@@ -68,6 +81,10 @@ namespace Omega.Rendering.PostProcessing
         protected override void OnInspectorGUI()
         {
             LUT = EditorGUILayout.ObjectField("LUT", LUT, typeof(Texture2D), false) as Texture2D;
+            if(LUT == proceduralLUT)
+            {
+                proceduralLUT.OnInspectorGUI();
+            }
             brightness = EditorGUILayout.Slider("Brightness", brightness, 0f, 2f);
         }
 #endif //UNITY_EDITOR

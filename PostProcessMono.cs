@@ -12,7 +12,7 @@ namespace Omega.Rendering.PostProcessing
     [ExecuteInEditMode]
     public class PostProcessMono : MonoBehaviour
     {
-        public const float MIN_SCALE = 0.01f;
+        public const float MIN_SCALE = 0.1f;
         public const float MAX_SCALE = 1f;
         protected float m_renderScale = MAX_SCALE;
         public float renderScale
@@ -28,7 +28,7 @@ namespace Omega.Rendering.PostProcessing
                     camera.targetTexture = null;
                     if (m_bufferRT != null)
                     {
-                        Object.Destroy(m_bufferRT);
+                        Object.DestroyImmediate(m_bufferRT);
                     }
                     int width = (int)(1920 * renderScale);
                     int height = (int)(1080 * renderScale);
@@ -98,9 +98,10 @@ namespace Omega.Rendering.PostProcessing
             camera.SetTargetBuffers(scaledownRT.colorBuffer, scaledownRT.depthBuffer);
         }
 
-        protected void OnEnable()
+
+        protected void OnDisable()
         {
-            enabled = uber.enabled;
+            camera.targetTexture = null;
         }
 
         void OnPostRender()
