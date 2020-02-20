@@ -29,9 +29,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        [SerializeField]
-        protected BloomParams m_bloomParams;
-        public BloomParams bloomParams = new BloomParams();
+        public BloomParams bloomParams = BloomParams.Default;
 
         protected override void OnEnable()
         {
@@ -48,16 +46,19 @@ namespace Omega.Rendering.PostProcessing
         {
             bloomTex.onValueChange += () => destMat.SetTexture(Props.bloomTex, bloomTex);
 
-            bloomParams.bloomParamsChanged += (param) => destMat.SetVector(Props.bloomParams, param);
-            bloomParams.filterParamsChanged += (param) => material.SetVector(Props.filterParams, param);
+            bloomParams.onValueChange += (param) =>
+            {
+                material.SetVector(Props.filterParams, param.filterParams);
+                destMat.SetVector(Props.bloomParams, param.bloomParams);
+            };
         }
 
         protected override void SetProperties()
         {
+            material.SetVector(Props.filterParams, bloomParams.filterParams);
+
             destMat.SetTexture(Props.bloomTex, bloomTex);
             destMat.SetVector(Props.bloomParams, bloomParams.bloomParams);
-
-            material.SetVector(Props.filterParams, bloomParams.filterParams);
         }
 
         public override void Process(RenderTexture src)
@@ -75,17 +76,157 @@ namespace Omega.Rendering.PostProcessing
 
         protected override void OnInspectorGUI()
         {
-            BloomParamsGUI();
+            bloomParams.OnInspectorGUI();
             bloomTex.OnGUI();
         }
 
         protected override void OnDebugGUI()
         {
-            BloomParamsGUI();
+            bloomParams.OnInspectorGUI();
             bloomTex.OnDebugGUI();
         }
+#endif //UNITY_EDITOR
+    }
 
-        void BloomParamsGUI()
+    [System.Serializable]
+    public struct BloomParams : IPostProcessParam<BloomParams>
+    {
+        #region FilterParams
+
+        [SerializeField]
+        private Vector4 m_filterParams;
+        public Vector4 filterParams => m_filterParams;
+
+        public float filterExp
+        {
+            get => m_filterParams.x;
+            set
+            {
+                if (value != m_filterParams.x)
+                {
+                    m_filterParams.x = value;
+                    m_onValueChange?.Invoke(this);
+                }
+            }
+        }
+
+        public float clampMax
+        {
+            get => m_filterParams.y;
+            set
+            {
+                if(value != m_filterParams.y)
+                {
+                    m_filterParams.y = value;
+                    m_onValueChange?.Invoke(this);
+                }
+            }
+        }
+
+        public float threshold
+        {
+            get => m_filterParams.z;
+            set
+            {
+                if(value != m_filterParams.z)
+                {
+                    m_filterParams.z = value;
+                    m_onValueChange?.Invoke(this);
+                }
+            }
+        }
+
+        public float knee
+        {
+            get => m_filterParams.w;
+            set
+            {
+                if(value != m_filterParams.w)
+                {
+                    m_filterParams.w = value;
+                    m_onValueChange?.Invoke(this);
+                }
+            }
+        }
+        #endregion //FilterParams
+
+        #region BloomParams
+
+        [SerializeField]
+        private Vector4 m_bloomParams;
+        public Vector4 bloomParams => m_bloomParams;
+
+        public int minMipLevel
+        {
+            get => (int)m_bloomParams.x;
+            set
+            {
+                if (value != minMipLevel)
+                {
+                    m_bloomParams.x = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+        public int maxMipLevel
+        {
+            get => (int)m_bloomParams.y;
+            set
+            {
+                if (value != maxMipLevel)
+                {
+                    m_bloomParams.y = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+        public float intensity
+        {
+            get => m_bloomParams.w;
+            set
+            {
+                if (value != m_bloomParams.w)
+                {
+                    m_bloomParams.w = value;
+                    UpdateBloomParams();
+                }
+            }
+        }
+
+        private void UpdateBloomParams()
+        {
+            m_bloomParams.z = 1f / (maxMipLevel - minMipLevel + 1);
+            m_onValueChange?.Invoke(this);
+        }
+        #endregion //BloomParams
+
+        private event UnityAction<BloomParams> m_onValueChange;
+        public event UnityAction<BloomParams> onValueChange
+        {
+            add
+            {
+                if (value != null)
+                {
+                    m_onValueChange += value;
+                    value.Invoke(this);
+                }
+            }
+            remove => m_onValueChange -= value;
+        }
+
+        public static BloomParams Default
+        {
+            get => new BloomParams()
+            {
+                m_filterParams = new Vector4(1.0f, 1.0f, 0.5f, 1.0f),
+                m_bloomParams = new Vector4( 1f, 3f, 0.3f)
+            };
+        }
+
+#if UNITY_EDITOR
+        public void OnInspectorGUI()
         {
             EditorGUILayout.LabelField("BloomParams");
             using (new GUILayout.HorizontalScope())
@@ -93,206 +234,17 @@ namespace Omega.Rendering.PostProcessing
                 EditorGUILayout.Space();
                 using (new GUILayout.VerticalScope())
                 {
-                    bloomParams.filterExp = EditorGUILayout.Slider("Filter Exp", bloomParams.filterExp, 1f, 10f);
-                    bloomParams.clampMax = EditorGUILayout.FloatField("Clamp Max", bloomParams.clampMax);
-                    bloomParams.threshold = EditorGUILayout.FloatField("Threshold", bloomParams.threshold);
-                    bloomParams.knee = EditorGUILayout.FloatField("Knee", bloomParams.knee);
+                    filterExp = EditorGUILayout.Slider("Filter Exp", filterExp, 1f, 10f);
+                    clampMax = EditorGUILayout.FloatField("Clamp Max", clampMax);
+                    threshold = EditorGUILayout.FloatField("Threshold", threshold);
+                    knee = EditorGUILayout.FloatField("Knee", knee);
 
-                    bloomParams.minMipLevel = EditorGUILayout.
-                        IntSlider(
-                            "Min Mipmap Level",
-                            bloomParams.minMipLevel,
-                            0,
-                            bloomParams.maxMipLevel);
-                    bloomParams.maxMipLevel = EditorGUILayout.
-                        IntSlider(
-                            "Max Mipmap Level",
-                            bloomParams.maxMipLevel,
-                            0,
-                            8);
-                    //bloomTex.RT.mipmapCount);
-                    bloomParams.intensity = EditorGUILayout.
-                        Slider("Intensity", bloomParams.intensity, 0, 1);
+                    minMipLevel = EditorGUILayout.IntSlider("Min Mipmap Level", minMipLevel, 0, maxMipLevel);
+                    maxMipLevel = EditorGUILayout.IntSlider( "Max Mipmap Level", maxMipLevel, 0, 8);
+                    intensity = EditorGUILayout.Slider("Intensity", intensity, 0, 1);
                 }
             }
         }
 #endif //UNITY_EDITOR
-    }
-
-    [System.Serializable]
-    public class BloomParams
-    {
-        protected event UnityAction<Vector4> m_bloomParamsChanged;
-        public event UnityAction<Vector4> bloomParamsChanged
-        {
-            add
-            {
-                if (value != null)
-                {
-                    m_bloomParamsChanged += value;
-                    value.Invoke(bloomParams);
-                }
-            }
-            remove => m_bloomParamsChanged -= value;
-        }
-
-        protected event UnityAction<Vector4> m_filterParamsChanged;
-        public event UnityAction<Vector4> filterParamsChanged
-        {
-            add
-            {
-                if (value != null)
-                {
-                    m_filterParamsChanged += value;
-                    value.Invoke(filterParams);
-                }
-            }
-            remove => m_filterParamsChanged -= value;
-        }
-
-        #region FilterParams
-        [SerializeField]
-        private float m_filterExp = 1.0f;
-        public float filterExp
-        {
-            get => m_filterExp;
-            set
-            {
-                if (value != m_filterExp)
-                {
-                    m_filterExp = value;
-                    UpdateFilterParams();
-                }
-            }
-        }
-
-        [SerializeField]
-        private float m_clampMax = 1.0f;
-        public float clampMax
-        {
-            get => m_clampMax;
-            set
-            {
-                if(value != m_clampMax)
-                {
-                    m_clampMax = value;
-                    UpdateFilterParams();
-                }
-            }
-        }
-
-        [SerializeField]
-        private float m_threshold = 0.5f;
-        public float threshold
-        {
-            get => m_threshold;
-            set
-            {
-                if(value != m_threshold)
-                {
-                    m_threshold = value;
-                    UpdateFilterParams();
-                }
-            }
-        }
-
-        [SerializeField]
-        private float m_knee = 1.0f;
-        public float knee
-        {
-            get => m_knee;
-            set
-            {
-                if(value != m_knee)
-                {
-                    m_knee = value;
-                    UpdateFilterParams();
-                }
-            }
-        }
-
-        private Vector4 m_filterParams;
-        public Vector4 filterParams => m_filterParams;
-        private void UpdateFilterParams()
-        {
-            m_filterParams = new Vector4()
-            {
-                x = filterExp,
-                y = clampMax,
-                z = threshold,
-                w = knee
-            };
-            m_filterParamsChanged?.Invoke(filterParams);
-        }
-        #endregion //FilterParams
-
-        #region BloomParams
-        [SerializeField]
-        private int m_minMipLevel = 1;
-        public int minMipLevel
-        {
-            get => m_minMipLevel;
-            set
-            {
-                if (value != m_minMipLevel)
-                {
-                    m_minMipLevel = value;
-                    UpdateBloomParams();
-                }
-            }
-        }
-
-        [SerializeField]
-        private int m_maxMipLevel = 3;
-        public int maxMipLevel
-        {
-            get => m_maxMipLevel;
-            set
-            {
-                if (value != m_maxMipLevel)
-                {
-                    m_maxMipLevel = value;
-                    UpdateBloomParams();
-                }
-            }
-        }
-
-        [SerializeField]
-        private float m_intensity = 0.3f;
-        public float intensity
-        {
-            get => m_intensity;
-            set
-            {
-                if (value != m_intensity)
-                {
-                    m_intensity = value;
-                    UpdateBloomParams();
-                }
-            }
-        }
-
-
-        private Vector4 m_bloomParams;
-        public Vector4 bloomParams => m_bloomParams;
-
-        private void UpdateBloomParams()
-        {
-            m_bloomParams = new Vector4()
-            {
-                x = minMipLevel,
-                y = maxMipLevel,
-                z = 1f / (maxMipLevel - minMipLevel + 1),
-                w = intensity
-            };
-            m_bloomParamsChanged?.Invoke(bloomParams);
-        }
-        #endregion //BloomParams
-
-        public BloomParams()
-        {
-            UpdateFilterParams();
-            UpdateBloomParams();
-        }
     }
 }

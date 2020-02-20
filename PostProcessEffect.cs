@@ -114,10 +114,4 @@ namespace Omega.Rendering.PostProcessing
 
 #endif //UNITY_EDITOR
     }
-
-    public enum PostProcessEffectMask : byte
-    {
-        ObjSpaceMotionBlur = 1 << 1,
-        ViewSpaceMotionBlur = 1 << 2
-    }
 }

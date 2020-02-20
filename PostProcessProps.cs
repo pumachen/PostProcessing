@@ -8,6 +8,10 @@ namespace Omega.Rendering.PostProcessing
     {
         public static readonly int mainTex         = Shader.PropertyToID("_MainTex");
 
+        #region FXAA
+        public static readonly int fxaaParams      = Shader.PropertyToID("_FXAAParams");
+        #endregion
+
         #region Bloom
         public static readonly int bloomTex        = Shader.PropertyToID("_BloomTex");
         public static readonly int bloomParams     = Shader.PropertyToID("_BloomParams");

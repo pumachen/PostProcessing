@@ -14,6 +14,7 @@
         Pass
         {
             CGPROGRAM
+			#pragma multi_compile FXAA_ENABLED __
             #pragma multi_compile BLOOM_ENABLED __
             #pragma multi_compile COLORGRADING_ENABLED __
             #pragma multi_compile CHROMATIC_ABERRATION_ENABLED __
@@ -27,14 +28,19 @@
 
             #include "UnityCG.cginc"
             //#include "CGIncludes/MotionBlur.cginc"
+			#include "CGIncludes/FXAA.cginc"
 			#include "CGIncludes/Bloom.cginc"
             #include "CGIncludes/ChromaticAberration.cginc"
             #include "CGIncludes/ColorGrading.cginc"
             #include "CGIncludes/Vignette.cginc"
 
-            fixed4 frag (v2f_img i) : SV_Target
-            {
+			fixed4 frag(v2f_img i) : SV_Target
+			{
+#if FXAA_ENABLED
+				fixed4 col = fxaa(_MainTex, _MainTex_TexelSize, i.uv);
+#else
                 fixed4 col = tex2D(_MainTex, i.uv);
+#endif
 
             #if CHROMATIC_ABERRATION_ENABLED
                 col = ApplyChromatic(col, i.uv);

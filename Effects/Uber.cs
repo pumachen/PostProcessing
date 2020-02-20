@@ -12,6 +12,10 @@ namespace Omega.Rendering.PostProcessing
     public class Uber : PostProcessPass
     {
         [SerializeField]
+        protected FXAA m_fxaa = new FXAA();
+        public FXAA fxaa => m_fxaa;
+
+        [SerializeField]
         protected FastBloom m_bloom = new FastBloom();
         public FastBloom bloom => m_bloom;
 
@@ -31,6 +35,7 @@ namespace Omega.Rendering.PostProcessing
         {
             get
             {
+                yield return fxaa;
                 yield return bloom;
                 yield return chromaticAberration;
                 yield return colorGrading;

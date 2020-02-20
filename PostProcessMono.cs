@@ -40,7 +40,14 @@ namespace Omega.Rendering.PostProcessing
         {
             camera.targetTexture = null;
             PostProcessManager.Process(scaledownRT);
-            Graphics.Blit(scaledownRT, null as RenderTexture, PostProcessManager.material);
+            if(PostProcessManager.material)
+            {
+                Graphics.Blit(scaledownRT, null as RenderTexture, PostProcessManager.material);
+            }
+            else
+            {
+                Graphics.Blit(scaledownRT, null as RenderTexture);
+            }
             camera.SetTargetBuffers(scaledownRT.colorBuffer, scaledownRT.depthBuffer);
         }
     }
