@@ -13,12 +13,10 @@ sampler2D _BloomTex;
 */
 float4 _FilterParams;
 
-#define Scatter       _FilterParams.x
-#define ClampMax      _FilterParams.y
-#define Threshold     _FilterParams.z
-#define ThresholdKnee _FilterParams.w
-
-#define FILTER_EXP    _FilterParams.x
+#define FILTER_EXP       _FilterParams.x
+#define FILTER_CLAMP_MAX _FilterParams.y
+#define FILTER_THRESHOLD _FilterParams.z
+#define FILTER_KNEE      _FilterParams.w
 
 float4 _BloomParams;
 
@@ -33,7 +31,6 @@ float4 _BloomParams;
 //
 half4 QuadraticThreshold(half4 color, half threshold, half3 curve)
 {
-	// Pixel brightness
 	half br = Max3(color.r, color.g, color.b);
 
 	// Under-threshold part: quadratic curve
@@ -45,12 +42,20 @@ half4 QuadraticThreshold(half4 color, half threshold, half3 curve)
 
 	return color;
 }
+half4 QuadraticThreshold(half4 color, half threshold, half knee)
+{
+	half3 curve = half3(threshold - knee, knee * 2, 0.25 / knee);
+
+	return QuadraticThreshold(color, threshold, curve);
+}
 
 fixed4 DownSample(sampler2D mainTex, float2 uv)
 {
 	fixed4 col = tex2D(mainTex, uv);
 	float brightness = Max3(col.r, col.g, col.b);
 	col.rgb *= saturate(pow(brightness, FILTER_EXP));
+	//col.rgb = min(FILTER_CLAMP_MAX, brightness);
+	col = QuadraticThreshold(col, FILTER_THRESHOLD, FILTER_KNEE);
 	return col;
 }
 

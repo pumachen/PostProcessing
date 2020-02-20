@@ -8,7 +8,7 @@ using UnityEditor;
 namespace Omega.Rendering.PostProcessing
 {
     [System.Serializable]
-    public abstract class PostProcessPass
+    public abstract class PostProcessPass : ScriptableObject
     {
         [SerializeField]
         private bool m_enabled = true;

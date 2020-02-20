@@ -200,7 +200,7 @@ namespace Omega.Rendering.PostProcessing
                 rounded ? ((float)res.height / res.width) : 1f);
             material.SetVector(Props.vignetteParams, param);
             Graphics.Blit(null, m_proceduralMask, material);
-            destMat.SetTexture(Props.vignetteMask, mask);
+            destMat?.SetTexture(Props.vignetteMask, mask);
         }
 
 #if UNITY_EDITOR

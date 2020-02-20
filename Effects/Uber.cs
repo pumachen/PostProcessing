@@ -7,6 +7,7 @@ using UnityEditor;
 
 namespace Omega.Rendering.PostProcessing
 {
+    [CreateAssetMenu(menuName = "Create/PostProcessProfile")]
     [System.Serializable]
     public class Uber : PostProcessPass
     {
@@ -54,5 +55,23 @@ namespace Omega.Rendering.PostProcessing
         }
 
 #endif //UNITY_EDITOR
+
+        /*[CustomEditor(typeof(Uber))]
+        public class UberEditor : Editor
+        {
+            new Uber target;
+
+            private void OnEnable()
+            {
+                target = base.target as Uber;
+            }
+
+            public override void OnInspectorGUI()
+            {
+                Undo.RecordObject(target, "Post Process Settings Modification");
+                target.InspectorGUI();
+                serializedObject.ApplyModifiedProperties();
+            }
+        }*/
     }
 }

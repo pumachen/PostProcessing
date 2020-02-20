@@ -94,6 +94,10 @@ namespace Omega.Rendering.PostProcessing
                 using (new GUILayout.VerticalScope())
                 {
                     bloomParams.filterExp = EditorGUILayout.Slider("Filter Exp", bloomParams.filterExp, 1f, 10f);
+                    bloomParams.clampMax = EditorGUILayout.FloatField("Clamp Max", bloomParams.clampMax);
+                    bloomParams.threshold = EditorGUILayout.FloatField("Threshold", bloomParams.threshold);
+                    bloomParams.knee = EditorGUILayout.FloatField("Knee", bloomParams.knee);
+
                     bloomParams.minMipLevel = EditorGUILayout.
                         IntSlider(
                             "Min Mipmap Level",
@@ -162,6 +166,51 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
+        [SerializeField]
+        private float m_clampMax = 1.0f;
+        public float clampMax
+        {
+            get => m_clampMax;
+            set
+            {
+                if(value != m_clampMax)
+                {
+                    m_clampMax = value;
+                    UpdateFilterParams();
+                }
+            }
+        }
+
+        [SerializeField]
+        private float m_threshold = 0.5f;
+        public float threshold
+        {
+            get => m_threshold;
+            set
+            {
+                if(value != m_threshold)
+                {
+                    m_threshold = value;
+                    UpdateFilterParams();
+                }
+            }
+        }
+
+        [SerializeField]
+        private float m_knee = 1.0f;
+        public float knee
+        {
+            get => m_knee;
+            set
+            {
+                if(value != m_knee)
+                {
+                    m_knee = value;
+                    UpdateFilterParams();
+                }
+            }
+        }
+
         private Vector4 m_filterParams;
         public Vector4 filterParams => m_filterParams;
         private void UpdateFilterParams()
@@ -169,9 +218,9 @@ namespace Omega.Rendering.PostProcessing
             m_filterParams = new Vector4()
             {
                 x = filterExp,
-                y = 0,
-                z = 0,
-                w = 0
+                y = clampMax,
+                z = threshold,
+                w = knee
             };
             m_filterParamsChanged?.Invoke(filterParams);
         }
