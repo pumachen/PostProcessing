@@ -12,7 +12,18 @@ namespace Omega.Rendering.PostProcessing
     [ExecuteInEditMode]
     public class PostProcessMono : MonoBehaviour
     {
-        protected new Camera camera = null;
+        protected Camera m_camera;
+        public new Camera camera
+        {
+            get
+            {
+                if(m_camera == null)
+                {
+                    m_camera = GetComponent<Camera>();
+                }
+                return m_camera;
+            }
+        }
 
         public float renderScale => PostProcessManager.renderScale;
 
@@ -20,7 +31,6 @@ namespace Omega.Rendering.PostProcessing
 
         protected void Start()
         {
-            camera = GetComponent<Camera>();
             if(!camera)
             {
                 enabled = false;

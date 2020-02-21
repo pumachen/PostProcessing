@@ -27,9 +27,7 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-#if UNITY_EDITOR
         public LUT proceduralLUT = new LUT(32);
-#endif
 
         [SerializeField]
         protected float m_brightness = 1.0f;
@@ -63,14 +61,9 @@ namespace Omega.Rendering.PostProcessing
             destMat.DisableKeyword("COLORGRADING_ENABLED");
         }
 
-        public override void Process(RenderTexture src)
-        {
-            proceduralLUT.Render();
-            base.Process(src);
-        }
-
         protected override void SetProperties()
         {
+            proceduralLUT.Render();
             destMat.SetTexture(Props.LUT, LUT);
             destMat.SetFloat(Props.brightness, m_brightness);
         }

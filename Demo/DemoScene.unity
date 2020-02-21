@@ -391,110 +391,50 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &304475823
+--- !u!1 &843393297
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 843393299}
+  - component: {fileID: 843393298}
+  m_Layer: 0
+  m_Name: PostProcessManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &843393298
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 843393297}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 042002a797b40b446b5993bc3fecdfb4, type: 3}
+  m_Script: {fileID: 11500000, guid: 560795881f12cce4f9166a2ad38966bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_enabled: 1
-  m_fxaa:
-    m_enabled: 0
-    fxaaParams:
-      m_params: {x: 0.0312, y: 0.063, z: 1, w: 0}
-  m_bloom:
-    m_enabled: 1
-    m_bloomTex:
-      m_resolutionMode: 0
-      m_camera: {fileID: 0}
-      m_scale: 0.5
-      m_resolution: {x: 512, y: 256}
-      m_format: 0
-      m_useMipMap: 1
-      m_name: Bloom Tex
-    bloomParams:
-      m_filterParams: {x: 1, y: 1, z: 0.5, w: 1}
-      m_bloomParams: {x: 1, y: 3, z: 0.33333334, w: 0.542}
-  m_chromaticAberration:
-    m_enabled: 0
-    m_spectralLut: {fileID: 0}
-    m_intensity: 0
-  m_colorGrading:
-    m_enabled: 0
-    m_LUT: {fileID: 0}
-    proceduralLUT:
-      m_resolutionMode: 1
-      m_camera: {fileID: 0}
-      m_scale: 1
-      m_resolution: {x: 1024, y: 32}
-      m_format: 0
-      m_useMipMap: 0
-      m_name: LUT
-      size: 32
-      precision: 128
-      tonemapping:
-        tonemapper: 0
-        neutralBlackIn: 0.1
-        neutralWhiteIn: 10
-        neutralBlackOut: 0
-        neutralWhiteOut: 10
-        neutralWhiteLevel: 10
-        neutralWhiteClip: 6
-      basic:
-        temperature: 0
-        tint: 0
-        hueShift: 0
-        saturation: 1
-        contrast: 1
-      channelMixer:
-        red: {x: 1, y: 0, z: 0}
-        green: {x: 0, y: 1, z: 0}
-        blue: {x: 0, y: 0, z: 1}
-        currentEditingChannel: 0
-      colorWheels:
-        mode: 0
-        log:
-          slope: {r: 0, g: 0, b: 0, a: 0}
-          power: {r: 0, g: 0, b: 0, a: 0}
-          offset: {r: 0, g: 0, b: 0, a: 0}
-        linear:
-          lift: {r: 0, g: 0, b: 0, a: 0}
-          gamma: {r: 0, g: 0, b: 0, a: 0}
-          gain: {r: 0, g: 0, b: 0, a: 0}
-      curveSettings:
-        HueVsHue:
-          m_size: 128
-        HueVsSat:
-          m_size: 128
-        SatVsSat:
-          m_size: 128
-        LumVsSat:
-          m_size: 128
-        Master:
-          m_size: 128
-        Red:
-          m_size: 128
-        Green:
-          m_size: 128
-        Blue:
-          m_size: 128
-    m_brightness: 1
-  m_vignette:
-    m_enabled: 0
-    m_mask: {fileID: 0}
-    m_color: {r: 0, g: 0, b: 0, a: 1}
-    m_opacity: 1
-    m_center: {x: 0.5, y: 0.5}
-    m_intensity: 0.1
-    m_smoothness: 1
-    m_roundness: 1
-    m_rounded: 0
+  m_uber: {fileID: 11400000, guid: d92a7daa5f5f75440aa93edd16f4fa60, type: 2}
+--- !u!4 &843393299
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843393297}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1148038026
 GameObject:
   m_ObjectHideFlags: 0
@@ -581,50 +521,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1148255110
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1148255112}
-  - component: {fileID: 1148255111}
-  m_Layer: 0
-  m_Name: PostProcessManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1148255111
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1148255110}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 560795881f12cce4f9166a2ad38966bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_uber: {fileID: 304475823}
---- !u!4 &1148255112
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1148255110}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1544884308
 GameObject:

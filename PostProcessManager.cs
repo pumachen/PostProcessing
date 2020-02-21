@@ -25,9 +25,8 @@ namespace Omega.Rendering.PostProcessing
                     {
                         Object.DestroyImmediate(m_scaledownRT);
                     }
-                    Resolution res = Screen.currentResolution;
-                    int width = (int)(1920 * renderScale);
-                    int height = (int)(1080 * renderScale);
+                    int width = (int)(Screen.width * renderScale);
+                    int height = (int)(Screen.height * renderScale);
                     m_scaledownRT = new RenderTexture(width, height, 24, RenderTextureFormat.Default);
                     m_scaledownRT.name = "ScaleDownRT";
                 }
@@ -51,7 +50,23 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        protected static PostProcessManager Instance;
+        protected static PostProcessManager m_Instance;
+        public static PostProcessManager Instance
+        {
+            get
+            {
+                if(m_Instance == null)
+                {
+                    var go = GameObject.Find("PostProcessManager");
+                    if (!go)
+                    {
+                        go = new GameObject("PostProcessManager", typeof(PostProcessManager));
+                    }
+                    m_Instance = go.GetComponent<PostProcessManager>();
+                }
+                return m_Instance;
+            }
+        }
 
         [SerializeField]
         protected Uber m_uber;
@@ -77,7 +92,7 @@ namespace Omega.Rendering.PostProcessing
 
         private void Awake()
         {
-            Instance = this;
+            m_Instance = this;
             uber.Init();
         }
 
@@ -120,7 +135,7 @@ namespace Omega.Rendering.PostProcessing
                 serializedObject.ApplyModifiedProperties();
             }
         }
-#endif //UNITY_EDITORd
+#endif //UNITY_EDITOR
 
     }
 }

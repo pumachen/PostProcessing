@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
@@ -17,13 +18,18 @@ namespace Omega.Rendering.PostProcessing
         }
 
         protected RenderTexture m_proceduralMask;
-        protected RenderTexture proceduralMask
+        public RenderTexture proceduralMask
         {
             get
             {
                 if (m_proceduralMask == null)
                 {
-                    UpdateProceduralMask();
+                    m_proceduralMask = new RenderTexture(
+                    Screen.width / 2,
+                    Screen.height / 2,
+                    0,
+                    RenderTextureFormat.R8)
+                    { name = "Procedural Mask" };
                 }
                 return m_proceduralMask;
             }
@@ -51,121 +57,31 @@ namespace Omega.Rendering.PostProcessing
         }
 
         [SerializeField]
-        protected Color m_color = Color.black;
-        public Color color
-        {
-            get => m_color;
-            set
-            {
-                if(color != value)
-                {
-                    m_color = value;
-                    destMat.SetColor(Props.vignetteColor, m_color);
-                }
-            }
-        }
+        public VignetteParams vignetteParams = VignetteParams.Default;
 
         [SerializeField]
-        protected float m_opacity = 1.0f;
-        public float opacity
-        {
-            get => m_opacity;
-            set
-            {
-                if(m_opacity != value)
-                {
-                    m_opacity = Mathf.Clamp01(value);
-                    destMat.SetFloat(Props.vignetteOpacity, m_opacity);
-                }
-            }
-        }
-
-        [SerializeField]
-        protected Vector2 m_center = new Vector2(0.5f, 0.5f);
-        public Vector2 center
-        {
-            get => m_center;
-            set
-            {
-                if(m_center != value)
-                {
-                    m_center = value;
-                    UpdateProceduralMask();
-                }
-            }
-        }
-
-        [SerializeField]
-        protected float m_intensity = 0.1f;
-        public float intensity
-        {
-            get => m_intensity;
-            set
-            {
-                if(m_intensity != value)
-                {
-                    m_intensity = value;
-                    UpdateProceduralMask();
-                }
-            }
-        }
-
-        [SerializeField]
-        protected float m_smoothness = 1f;
-        public float smoothness
-        {
-            get => m_smoothness;
-            set
-            {
-                if(m_smoothness != value)
-                {
-                    m_smoothness = value;
-                    UpdateProceduralMask();
-                }
-            }
-        }
-
-        [SerializeField]
-        protected float m_roundness = 1f;
-        public float roundness
-        {
-            get => m_roundness;
-            set
-            {
-                if(m_roundness != value)
-                {
-                    m_roundness = value;
-                    UpdateProceduralMask();
-                }
-            }
-        }
-
-        [SerializeField]
-        protected bool m_rounded = false;
-        public bool rounded
-        {
-            get => m_rounded;
-            set
-            {
-                if(m_rounded != value)
-                {
-                    m_rounded = value;
-                    UpdateProceduralMask();
-                }
-            }
-        }
+        public VignetteMaskParams maskParams = VignetteMaskParams.Default;
 
         protected override void Init()
         {
             base.Init();
-            UpdateProceduralMask();
+            maskParams.onValueChange += (param) =>
+            {
+                UpdateProceduralMask();
+                destMat.SetTexture(Props.vignetteMask, proceduralMask);
+            };
+            vignetteParams.onValueChange += (param) =>
+            {
+                destMat.SetColor(Props.vignetteColor, vignetteParams.color);
+                destMat.SetFloat(Props.vignetteOpacity, vignetteParams.opacity);
+            };
         }
 
         protected override void SetProperties()
         {
             destMat.SetTexture(Props.vignetteMask, mask);
-            destMat.SetColor(Props.vignetteColor, color);
-            destMat.SetFloat(Props.vignetteOpacity, opacity);
+            destMat.SetColor(Props.vignetteColor, vignetteParams.color);
+            destMat.SetFloat(Props.vignetteOpacity, vignetteParams.opacity);
         }
 
         protected override void OnEnable()
@@ -182,25 +98,18 @@ namespace Omega.Rendering.PostProcessing
 
         protected void UpdateProceduralMask()
         {
-            Resolution res = Screen.currentResolution;
-            if (m_proceduralMask == null)
-            {
-                m_proceduralMask = new RenderTexture(
-                    res.width / 2,
-                    res.height / 2,
-                    0,
-                    RenderTextureFormat.R8)
-                { name = "Procedural Mask" };
-            }
-            material.SetVector(Props.vignetteCenter, center);
-            Vector4 param = new Vector4(
-                intensity * 3f,
-                smoothness * 5f,
-                roundness,
-                rounded ? ((float)res.height / res.width) : 1f);
-            material.SetVector(Props.vignetteParams, param);
+            material.SetVector(Props.vignetteCenter, maskParams.center);
+            material.SetVector(Props.vignetteParams, maskParams);
             Graphics.Blit(null, m_proceduralMask, material);
-            destMat?.SetTexture(Props.vignetteMask, mask);
+        }
+
+        public override void Process(RenderTexture src)
+        {
+            base.Process(src);
+            if(proceduralMask.updateCount < 1)
+            {
+                UpdateProceduralMask();
+            }
         }
 
 #if UNITY_EDITOR
@@ -208,19 +117,197 @@ namespace Omega.Rendering.PostProcessing
         protected override void OnInspectorGUI()
         {
             mask = EditorGUILayout.ObjectField("Vignette Mask", mask, typeof(Texture), false) as Texture;
-            color = EditorGUILayout.ColorField("Color", color);
-            opacity = EditorGUILayout.Slider("Opacity", opacity, 0f, 1f);
+            vignetteParams.OnInspectorGUI();
             if(mask == proceduralMask)
             {
                 EditorGUILayout.LabelField("Procedural Mask");
+                maskParams.OnInspectorGUI();
+            }
+        }
+#endif
+        [System.Serializable]
+        public struct VignetteParams : IPostProcessParam<VignetteParams>
+        {
+            [SerializeField]
+            private Color m_color;
+            public Color color
+            {
+                get => m_color;
+                set
+                {
+                    if(value != m_color)
+                    {
+                        m_color = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            [SerializeField]
+            private float m_opacity;
+            public float opacity
+            {
+                get => m_opacity;
+                set
+                {
+                    if(value != m_opacity)
+                    {
+                        m_opacity = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<VignetteParams> m_onValueChange;
+            public event UnityAction<VignetteParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static VignetteParams Default
+            {
+                get => new VignetteParams()
+                {
+                    m_opacity = 1.0f,
+                    m_color = Color.black
+                };
+            }
+
+#if UNITY_EDITOR
+            public void OnInspectorGUI()
+            {
+                color = EditorGUILayout.ColorField("Color", color);
+                opacity = EditorGUILayout.Slider("Opacity", opacity, 0f, 1f);
+            }
+#endif
+        }
+
+        [System.Serializable]
+        public struct VignetteMaskParams : IPostProcessParam<VignetteMaskParams>
+        {
+            [SerializeField]
+            private Vector2 m_center;
+
+            [SerializeField]
+            private Vector4 m_params;
+
+            [SerializeField]
+            private bool m_rounded;
+
+            public Vector2 center
+            {
+                get => m_center;
+                set
+                {
+                    if(m_center != value)
+                    {
+                        m_center = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            public float intensity
+            {
+                get => m_params.x / 3f;
+                set
+                {
+                    if(value != intensity)
+                    {
+                        m_params.x = value * 3f;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+            public float smoothness
+            {
+                get => m_params.y / 5f;
+                set
+                {
+                    if(value != smoothness)
+                    {
+                        m_params.y = value * 5f;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+            public float roundness
+            {
+                get => m_params.z;
+                set
+                {
+                    if(value != m_params.z)
+                    {
+                        m_params.z = value;
+                        Resolution res = Screen.currentResolution;
+                        m_params.w = rounded ? ((float)res.height / res.width) : 1f;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            public bool rounded
+            {
+                get => m_rounded;
+                set
+                {
+                    if(value != m_rounded)
+                    {
+                        m_rounded = value;
+                        Resolution res = Screen.currentResolution;
+                        m_params.w = rounded ? ((float)res.height / res.width) : 1f;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<VignetteMaskParams> m_onValueChange;
+            public event UnityAction<VignetteMaskParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static VignetteMaskParams Default
+            {
+                get => new VignetteMaskParams()
+                {
+                    m_rounded = false,
+                    m_params = new Vector4(0.3f, 5f, 1f, 1f),
+                    m_center = new Vector2(0.5f, 0.5f)
+                };
+            }
+
+            public static implicit operator Vector4(VignetteMaskParams param)
+            {
+                return param.m_params;
+            }
+
+#if UNITY_EDITOR
+            public void OnInspectorGUI()
+            {
                 center = EditorGUILayout.Vector2Field("Center", center);
                 intensity = EditorGUILayout.Slider("Intensity", intensity, 0f, 1f);
                 smoothness = EditorGUILayout.Slider("Smoothness", smoothness, 0f, 1f);
                 roundness = EditorGUILayout.Slider("Roundness", roundness, 0f, 1f);
                 rounded = EditorGUILayout.Toggle("Rounded", rounded);
             }
-            
-        }
 #endif
+        }
     }
 }

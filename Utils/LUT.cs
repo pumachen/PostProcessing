@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEngine.Events;
 
 namespace Omega.Rendering.PostProcessing
 {
@@ -9,35 +10,143 @@ namespace Omega.Rendering.PostProcessing
         public int size = 32;
         public int precision = 128;
 
-        #region ToneMapping Settings
+        #region ToneMapping Params
 
-        public ToneMappingSettings tonemapping = ToneMappingSettings.Default;
+        public ToneMappingParams tonemapping = ToneMappingParams.Default;
 
         [System.Serializable]
-        public struct ToneMappingSettings
+        public struct ToneMappingParams : IPostProcessParam<ToneMappingParams>
         {
-            [Tooltip("Tonemapping algorithm to use at the end of the color grading process. Use \"Neutral\" if you need a customizable tonemapper or \"Filmic\" to give a standard filmic look to your scenes.")]
-            public ToneMapper tonemapper;
+            [SerializeField]
+            private ToneMapper m_tonemapper;
+            public ToneMapper tonemapper
+            {
+                get => m_tonemapper;
+                set
+                {
+                    if(value != m_tonemapper)
+                    {
+                        m_tonemapper = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
             // Neutral settings
-            [Range(-0.1f, 0.1f)]
-            public float neutralBlackIn;
+            [SerializeField]
+            private Vector4 m_neutralInOut;
 
-            [Range(1f, 20f)]
-            public float neutralWhiteIn;
+            [SerializeField]
+            private Vector4 m_neutralWhiteLevel;
 
-            [Range(-0.09f, 0.1f)]
-            public float neutralBlackOut;
+            //[Range(-0.1f, 0.1f)]
+            public float neutralBlackIn
+            {
+                get => m_neutralInOut.x;
+                set
+                {
+                    if(value != m_neutralInOut.x)
+                    {
+                        m_neutralInOut.x = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            [Range(1f, 19f)]
-            public float neutralWhiteOut;
+            public float neutralWhiteIn
+            {
+                get => m_neutralInOut.y;
+                set
+                {
+                    if (value != m_neutralInOut.y)
+                    {
+                        m_neutralInOut.y = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            [Range(0.1f, 20f)]
-            public float neutralWhiteLevel;
+            public float neutralBlackOut
+            {
+                get => m_neutralInOut.z;
+                set
+                {
+                    if (value != m_neutralInOut.z)
+                    {
+                        m_neutralInOut.z = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            [Range(1f, 10f)]
-            public float neutralWhiteClip;
+            public float neutralWhiteOut
+            {
+                get => m_neutralInOut.w;
+                set
+                {
+                    if (value != m_neutralInOut.w)
+                    {
+                        m_neutralInOut.w = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
+            public float neutralWhiteLevel
+            {
+                get => m_neutralWhiteLevel.x;
+                set
+                {
+                    if(value != m_neutralWhiteLevel.x)
+                    {
+                        m_neutralWhiteLevel.x = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            public float neutralWhiteClip
+            {
+                get => m_neutralWhiteLevel.y;
+                set
+                {
+                    if (value != m_neutralWhiteLevel.y)
+                    {
+                        m_neutralWhiteLevel.y = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<ToneMappingParams> m_onValueChange;
+            public event UnityAction<ToneMappingParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static ToneMappingParams Default
+            {
+                get
+                {
+                    return new ToneMappingParams
+                    {
+                        m_tonemapper = ToneMapper.None,
+
+                        m_neutralInOut = new Vector4(0.1f, 10f, 0f, 10f),
+                        m_neutralWhiteLevel = new Vector4(10f, 6f)
+                    };
+                }
+            }
+
+#if UNITY_EDITOR
             private bool foldout;
 
             public void OnInspectorGUI()
@@ -63,25 +172,7 @@ namespace Omega.Rendering.PostProcessing
                     }
                 }
             }
-
-            public static ToneMappingSettings Default
-            {
-                get
-                {
-                    return new ToneMappingSettings
-                    {
-                        tonemapper = ToneMapper.None,
-
-                        neutralBlackIn = 0.1f,
-                        neutralWhiteIn = 10f,
-                        neutralBlackOut = 0f,
-                        neutralWhiteOut = 10f,
-                        neutralWhiteLevel = 10f,
-                        neutralWhiteClip = 6f
-                    };
-                }
-            }
-
+#endif
             public enum ToneMapper
             {
                 None,
@@ -90,30 +181,113 @@ namespace Omega.Rendering.PostProcessing
             }
         }
 
-        #endregion //ToneMapping Settings
+        #endregion //ToneMapping Params
 
-        #region Basic Settings
+        #region Basic Params
 
-        public BasicSettings basic = BasicSettings.Default;
+        public BasicParams basic = BasicParams.Default;
 
         [System.Serializable]
-        public struct BasicSettings
+        public struct BasicParams : IPostProcessParam<BasicParams>
         {
-            [Range(-100f, 100f), Tooltip("Sets the white balance to a custom color temperature.")]
-            public float temperature;
+            [SerializeField]
+            private Vector4 m_params;
 
-            [Range(-100f, 100f), Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
-            public float tint;
+            [SerializeField]
+            private float m_hueShift;
 
-            [Range(-180f, 180f), Tooltip("Shift the hue of all colors.")]
-            public float hueShift;
+            public float temperature
+            {
+                get => m_params.x;
+                set
+                {
+                    if(value != m_params.x)
+                    {
+                        m_params.x = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            [Range(0f, 2f), Tooltip("Pushes the intensity of all colors.")]
-            public float saturation;
+            public float tint
+            {
+                get => m_params.y;
+                set
+                {
+                    if (value != m_params.y)
+                    {
+                        m_params.y = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            [Range(0f, 2f), Tooltip("Expands or shrinks the overall range of tonal values.")]
-            public float contrast;
+            public float saturation
+            {
+                get => m_params.z;
+                set
+                {
+                    if (value != m_params.z)
+                    {
+                        m_params.z = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
+            public float contrast
+            {
+                get => m_params.w;
+                set
+                {
+                    if (value != m_params.w)
+                    {
+                        m_params.w = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            public float hueShift
+            {
+                get => m_hueShift;
+                set
+                {
+                    if(value != m_hueShift)
+                    {
+                        m_hueShift = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<BasicParams> m_onValueChange;
+            public event UnityAction<BasicParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static BasicParams Default
+            {
+                get
+                {
+                    return new BasicParams
+                    {
+                        m_params = new Vector4(0f, 0f, 1f, 1f),
+                        m_hueShift = 0f
+                    };
+                }
+            }
+
+#if UNITY_EDITOR
             private bool foldout;
 
             public void OnInspectorGUI()
@@ -129,44 +303,94 @@ namespace Omega.Rendering.PostProcessing
                 {
                     temperature = EditorGUILayout.Slider("Temperature", temperature, -100f, 100f);
                     tint = EditorGUILayout.Slider("Tint", tint, -100f, 100f);
-                    hueShift = EditorGUILayout.Slider("Hue Shift", hueShift, -180f, 180f);
                     saturation = EditorGUILayout.Slider("Saturation", saturation, 0f, 2f);
                     contrast = EditorGUILayout.Slider("Contrast", contrast, 0f, 2f);
+                    hueShift = EditorGUILayout.Slider("Hue Shift", hueShift, -180f, 180f);
+                }
+            }
+#endif
+        }
+
+        #endregion //Basic Params
+
+        #region ChannelMixer Params
+
+        public ChannelMixerParams channelMixer = ChannelMixerParams.Default;
+
+        [System.Serializable]
+        public struct ChannelMixerParams : IPostProcessParam<ChannelMixerParams>
+        {
+            [SerializeField]
+            private Vector3 m_red;
+            public Vector3 red
+            {
+                get => m_red;
+                set
+                {
+                    if(value != m_red)
+                    {
+                        m_red = value;
+                        m_onValueChange?.Invoke(this);
+                    }
                 }
             }
 
-            public static BasicSettings Default
+            [SerializeField]
+            private Vector3 m_green;
+            public Vector3 green
+            {
+                get => m_green;
+                set
+                {
+                    if (value != m_green)
+                    {
+                        m_green = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            [SerializeField]
+            private Vector3 m_blue;
+            public Vector3 blue
+            {
+                get => m_blue;
+                set
+                {
+                    if (value != m_blue)
+                    {
+                        m_blue = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<ChannelMixerParams> m_onValueChange;
+            public event UnityAction<ChannelMixerParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static ChannelMixerParams Default
             {
                 get
                 {
-                    return new BasicSettings
+                    return new ChannelMixerParams
                     {
-                        temperature = 0f,
-                        tint = 0f,
-
-                        hueShift = 0f,
-                        saturation = 1f,
-                        contrast = 1f,
+                        m_red = new Vector3(1f, 0f, 0f),
+                        m_green = new Vector3(0f, 1f, 0f),
+                        m_blue = new Vector3(0f, 0f, 1f)
                     };
                 }
             }
-        }
-
-        #endregion //Basic Settings
-
-        #region ChannelMixer Settings
-
-        public ChannelMixerSettings channelMixer = ChannelMixerSettings.Default;
-
-        [System.Serializable]
-        public struct ChannelMixerSettings
-        {
-            public Vector3 red;
-            public Vector3 green;
-            public Vector3 blue;
-
-            [HideInInspector]
-            public int currentEditingChannel; // Used only in the editor
 
 #if UNITY_EDITOR
             private bool foldout;
@@ -189,96 +413,14 @@ namespace Omega.Rendering.PostProcessing
             }
 #endif //UNITY_EDITOR
 
-            public static ChannelMixerSettings Default
-            {
-                get
-                {
-                    return new ChannelMixerSettings
-                    {
-                        red = new Vector3(1f, 0f, 0f),
-                        green = new Vector3(0f, 1f, 0f),
-                        blue = new Vector3(0f, 0f, 1f),
-                        currentEditingChannel = 0
-                    };
-                }
-            }
+            
         }
 
-        #endregion //ChannelMixer Settings
+        #endregion //ChannelMixer Params
 
-        #region ColorWheels Settings
+        #region ColorWheels Params
 
-        public ColorWheelsSettings colorWheels = ColorWheelsSettings.Default;
-
-        [System.Serializable]
-        public struct LogWheelsSettings
-        {
-            //[Trackball("GetSlopeValue")]
-            public Color slope;
-
-            //[Trackball("GetPowerValue")]
-            public Color power;
-
-            //[Trackball("GetOffsetValue")]
-            public Color offset;
-
-#if UNITY_EDITOR
-            public void OnInspectorGUI()
-            {
-                slope = EditorGUILayout.ColorField("Slope", slope);
-                power = EditorGUILayout.ColorField("Power", power);
-                offset = EditorGUILayout.ColorField("Offset", offset);
-            }
-#endif // UNITY_EDITOR
-
-            public static LogWheelsSettings Default
-            {
-                get
-                {
-                    return new LogWheelsSettings
-                    {
-                        slope = Color.clear,
-                        power = Color.clear,
-                        offset = Color.clear
-                    };
-                }
-            }
-        }
-
-        [System.Serializable]
-        public struct LinearWheelsSettings
-        {
-            //[Trackball("GetLiftValue")]
-            public Color lift;
-
-            //[Trackball("GetGammaValue")]
-            public Color gamma;
-
-            //[Trackball("GetGainValue")]
-            public Color gain;
-
-#if UNITY_EDITOR
-            public void OnInspectorGUI()
-            {
-                lift = EditorGUILayout.ColorField("Lift", lift);
-                gamma = EditorGUILayout.ColorField("Gamma", gamma);
-                gain = EditorGUILayout.ColorField("Gain", gain);
-            }
-#endif // UNITY_EDITOR
-
-            public static LinearWheelsSettings Default
-            {
-                get
-                {
-                    return new LinearWheelsSettings
-                    {
-                        lift = Color.clear,
-                        gamma = Color.clear,
-                        gain = Color.clear
-                    };
-                }
-            }
-        }
+        public ColorWheelParams colorWheels = ColorWheelParams.Default;
 
         public enum ColorWheelMode
         {
@@ -287,18 +429,151 @@ namespace Omega.Rendering.PostProcessing
         }
 
         [System.Serializable]
-        public struct ColorWheelsSettings
+        public struct ColorWheelParams : IPostProcessParam<ColorWheelParams>
         {
-            public ColorWheelMode mode;
+            [SerializeField]
+            private ColorWheelMode m_mode;
+            public ColorWheelMode mode
+            {
+                get => m_mode;
+                set
+                {
+                    if(value != m_mode)
+                    {
+                        m_mode = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            //[TrackballGroup]
-            public LogWheelsSettings log;
+            // Log Wheel Params
+            [SerializeField]
+            private Color m_slope;
+            public Color slope
+            {
+                get => m_slope;
+                set
+                {
+                    if (value != m_slope)
+                    {
+                        m_slope = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
-            //[TrackballGroup]
-            public LinearWheelsSettings linear;
+            [SerializeField]
+            private Color m_power;
+            public Color power
+            {
+                get => m_power;
+                set
+                {
+                    if (value != m_power)
+                    {
+                        m_power = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
 
+            [SerializeField]
+            private Color m_offset;
+            public Color offset
+            {
+                get => m_offset;
+                set
+                {
+                    if (value != m_offset)
+                    {
+                        m_offset = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+
+            // Linear Wheel Params
+            [SerializeField]
+            private Color m_lift;
+            public Color lift
+            {
+                get => m_lift;
+                set
+                {
+                    if (value != m_lift)
+                    {
+                        m_lift = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            [SerializeField]
+            private Color m_gamma;
+            public Color gamma
+            {
+                get => m_gamma;
+                set
+                {
+                    if (value != m_gamma)
+                    {
+                        m_gamma = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            [SerializeField]
+            private Color m_gain;
+            public Color gain
+            {
+                get => m_gain;
+                set
+                {
+                    if (value != m_gain)
+                    {
+                        m_gain = value;
+                        m_onValueChange?.Invoke(this);
+                    }
+                }
+            }
+
+            private event UnityAction<ColorWheelParams> m_onValueChange;
+            public event UnityAction<ColorWheelParams> onValueChange
+            {
+                add
+                {
+                    if (value != null)
+                    {
+                        m_onValueChange += value;
+                        value.Invoke(this);
+                    }
+                }
+                remove => m_onValueChange -= value;
+            }
+
+            public static ColorWheelParams Default
+            {
+                get
+                {
+                    return new ColorWheelParams
+                    {
+                        m_mode = ColorWheelMode.Linear,
+
+                        m_slope = Color.clear,
+                        m_power = Color.clear,
+                        m_offset = Color.clear,
+
+                        m_lift = Color.clear,
+                        m_gamma = Color.clear,
+                        m_gain = Color.clear
+                    };
+                }
+            }
+
+#if UNITY_EDITOR
             private bool foldout;
-
             public void OnInspectorGUI()
             {
                 EditorGUILayout.BeginHorizontal();
@@ -315,33 +590,25 @@ namespace Omega.Rendering.PostProcessing
                     {
                         case ColorWheelMode.Log:
                             {
-                                log.OnInspectorGUI();
+                                slope = EditorGUILayout.ColorField("Slope", slope);
+                                power = EditorGUILayout.ColorField("Power", power);
+                                offset = EditorGUILayout.ColorField("Offset", offset);
                                 break;
                             }
                         case ColorWheelMode.Linear:
                             {
-                                linear.OnInspectorGUI();
+                                lift = EditorGUILayout.ColorField("Lift", lift);
+                                gamma = EditorGUILayout.ColorField("Gamma", gamma);
+                                gain = EditorGUILayout.ColorField("Gain", gain);
                                 break;
                             }
                     }
                 }
             }
-
-            public static ColorWheelsSettings Default
-            {
-                get
-                {
-                    return new ColorWheelsSettings
-                    {
-                        mode = ColorWheelMode.Linear,
-                        log = LogWheelsSettings.Default,
-                        linear = LinearWheelsSettings.Default
-                    };
-                }
-            }
+#endif
         }
 
-        #endregion //ColorWheels Settings
+        #endregion //ColorWheel Params
 
         #region Curve Settings
 
@@ -360,6 +627,26 @@ namespace Omega.Rendering.PostProcessing
             public RampMap Green;
             public RampMap Blue;
 
+            public static CurveSettings Default
+            {
+                get
+                {
+                    return new CurveSettings()
+                    {
+                        HueVsHue = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
+                        HueVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
+                        SatVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
+                        LumVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
+
+                        Master = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
+                        Red = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
+                        Green = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
+                        Blue = new RampMap(AnimationCurve.Linear(0, 0, 1, 1))
+                    };
+                }
+            }
+
+#if UNITY_EDITOR
             private bool foldout;
 
             public void OnInspectorGUI()
@@ -394,28 +681,10 @@ namespace Omega.Rendering.PostProcessing
                     Blue.Update();
                 }
             }
-
-            public static CurveSettings Default
-            {
-                get
-                {
-                    return new CurveSettings()
-                    {
-                        HueVsHue = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
-                        HueVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
-                        SatVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
-                        LumVsSat = new RampMap(AnimationCurve.Constant(0, 1, 0.5f)),
-
-                        Master = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
-                        Red = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
-                        Green = new RampMap(AnimationCurve.Linear(0, 0, 1, 1)),
-                        Blue = new RampMap(AnimationCurve.Linear(0, 0, 1, 1))
-                    };
-                }
-            }
+#endif
         }
 
-        #endregion //Curve Settings
+#endregion //Curve Settings
 
         private Material m_material;
         protected Material material
@@ -439,6 +708,7 @@ namespace Omega.Rendering.PostProcessing
             this.size = size;
         }
 
+#if UNITY_EDITOR
         public void OnInspectorGUI()
         {
             tonemapping.OnInspectorGUI();
@@ -446,13 +716,6 @@ namespace Omega.Rendering.PostProcessing
             channelMixer.OnInspectorGUI();
             colorWheels.OnInspectorGUI();
             curveSettings.OnInspectorGUI();
-
-            EditorGUILayout.ObjectField("Material", material, typeof(Material), false);
-
-            if(GUILayout.Button("Apply"))
-            {
-                Render();
-            }
 
             GUIStyle style = new GUIStyle()
             {
@@ -464,6 +727,7 @@ namespace Omega.Rendering.PostProcessing
                 Selection.objects = new Object[] { RT };
             }
         }
+#endif
 
         public void Render()
         {
@@ -477,7 +741,7 @@ namespace Omega.Rendering.PostProcessing
             material.shaderKeywords = null;
             switch(tonemapping.tonemapper)
             {
-                case ToneMappingSettings.ToneMapper.Neutral:
+                case ToneMappingParams.ToneMapper.Neutral:
                 {
                     material.EnableKeyword("TONEMAPPING_NEUTRAL");
 
@@ -503,7 +767,7 @@ namespace Omega.Rendering.PostProcessing
                     break;
                 }
 
-                case ToneMappingSettings.ToneMapper.ACES:
+                case ToneMappingParams.ToneMapper.ACES:
                 {
                     material.EnableKeyword("TONEMAPPING_FILMIC");
                     break;
@@ -519,9 +783,9 @@ namespace Omega.Rendering.PostProcessing
             // Lift / Gamma / Gain
             Vector3 lift, gamma, gain;
             CalculateLiftGammaGain(
-                colorWheels.linear.lift,
-                colorWheels.linear.gamma,
-                colorWheels.linear.gain,
+                colorWheels.lift,
+                colorWheels.gamma,
+                colorWheels.gain,
                 out lift, out gamma, out gain
                 );
 
@@ -532,9 +796,9 @@ namespace Omega.Rendering.PostProcessing
             // Slope / Power / Offset
             Vector3 slope, power, offset;
             CalculateSlopePowerOffset(
-                colorWheels.log.slope,
-                colorWheels.log.power,
-                colorWheels.log.offset,
+                colorWheels.slope,
+                colorWheels.power,
+                colorWheels.offset,
                 out slope, out power, out offset
                 );
 

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Hidden_PostProcess_VignetteMaskBaker
-  m_Shader: {fileID: 4800000, guid: f99c2dc1aec68f647b2e70af296576ba, type: 3}
+  m_Shader: {fileID: 4800000, guid: b60793bbd9b4358458e112b13bafc2b0, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -22,5 +22,4 @@ Material:
     m_Floats: []
     m_Colors:
     - _Vignette_Center: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _Vignette_Centter: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _Vignette_Params: {r: 0.41, g: 11.91, b: 0.84, a: 1}
+    - _Vignette_Params: {r: 0, g: 0, b: 0, a: 0}
