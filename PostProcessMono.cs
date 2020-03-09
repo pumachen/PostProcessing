@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif //UNITY_EDITOR
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [RequireComponent(typeof(Camera))]
     [ExecuteInEditMode]

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
+using Props = Fuxi.Rendering.PostProcessing.PostProcessProperties;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [System.Serializable]
     public class FXAA : PostProcessEffect

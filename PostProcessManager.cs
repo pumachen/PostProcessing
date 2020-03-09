@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [ExecuteInEditMode]
     public class PostProcessManager : MonoBehaviour

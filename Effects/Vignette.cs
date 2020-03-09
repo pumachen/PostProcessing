@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Props = Omega.Rendering.PostProcessing.PostProcessProperties;
+using Props = Fuxi.Rendering.PostProcessing.PostProcessProperties;
 using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif //UNITY_EDITOR
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [System.Serializable]
     public class Vignette : PostProcessEffect

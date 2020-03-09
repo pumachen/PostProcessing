@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     public interface IPostProcessParam<T> where T : struct, IPostProcessParam<T>
     {

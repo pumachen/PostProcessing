@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif //UNITY_EDITOR
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [System.Serializable]
     public abstract class PostProcessPass : ScriptableObject

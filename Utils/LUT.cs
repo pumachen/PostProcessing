@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine.Events;
 
-namespace Omega.Rendering.PostProcessing
+namespace Fuxi.Rendering.PostProcessing
 {
     [System.Serializable]
     public class LUT : BufferRT
